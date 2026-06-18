@@ -1,0 +1,52 @@
+{
+  "uid": "containers",
+  "title": "Container Health",
+  "tags": ["crm", "containers"],
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Container Health",
+      "gridPos": {"x": 0, "y": 0, "w": 8, "h": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "expr": "count(container_last_seen{name!=\"\"} > (time() - 30))",
+          "legendFormat": "Running Containers"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Container Restarts",
+      "gridPos": {"x": 8, "y": 0, "w": 16, "h": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "expr": "increase(container_restart_count{name!=\"\"}[1h])",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Container Uptime (seconds)",
+      "gridPos": {"x": 0, "y": 6, "w": 24, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {
+          "expr": "time() - container_start_time_seconds{name!=\"\"}",
+          "legendFormat": "{{name}}"
+        }
+      ]
+    }
+  ],
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {}
+}

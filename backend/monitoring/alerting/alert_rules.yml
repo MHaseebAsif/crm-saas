@@ -1,0 +1,29 @@
+groups:
+  - name: service_alerts
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.job }} has been unreachable for more than 1 minute"
+
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[2m]) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on {{ $labels.job }}"
+          description: "{{ $labels.job }} CPU usage is above 80% for 2 minutes"
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 512 * 1024 * 1024
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory on {{ $labels.job }}"
+          description: "{{ $labels.job }} memory usage exceeds 512MB for 2 minutes"
