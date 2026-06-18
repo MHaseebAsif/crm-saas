@@ -1,0 +1,21 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+  delete:
+    enabled: true
+auth:
+  htpasswd:
+    realm: Registry
+    path: /etc/docker/registry/htpasswd
+http:
+  addr: :5000
+  secret: registry-secret
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3
