@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: crm-saas
+resources:
+  - namespace.yaml
+  - configmaps/app-config.yaml
+  - secrets/postgres-secret.yaml
+  - ../infra/postgresql/statefulset.yaml
+  - ../infra/redis/deployment.yaml
+  - ../infra/rabbitmq/statefulset.yaml
+  - ../services/auth-service/deployment.yaml
+  - ../services/auth-service/service.yaml
+  - ../services/auth-service/hpa.yaml
+  - ../services/user-service/deployment.yaml
+  - ../services/user-service/service.yaml
+  - ../services/crm-service/deployment.yaml
+  - ../services/crm-service/service.yaml
+  - ../services/notification-service/deployment.yaml
+  - ../services/notification-service/service.yaml
