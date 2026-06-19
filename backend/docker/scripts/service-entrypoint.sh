@@ -21,4 +21,4 @@ async def run():
     await Tortoise.close_connections()
 asyncio.run(run())
 "
-exec uvicorn main:app --host 0.0.0.0 --port 8001
+exec uvicorn main:app --host 0.0.0.0 --port 8000

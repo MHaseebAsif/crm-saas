@@ -8,3 +8,4 @@ aio-pika==9.3.0
 aiosmtplib==3.0.1
 pydantic==2.3.0
 pydantic-settings==2.0.3
+psycopg2-binary
