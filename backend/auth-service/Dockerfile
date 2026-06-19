@@ -5,6 +5,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python:3.11-slim
 RUN useradd -m appuser
+RUN mkdir -p /app/migrations && chown -R appuser:appuser /app
 USER appuser
 WORKDIR /app
 COPY --from=b /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
