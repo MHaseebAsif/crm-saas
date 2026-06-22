@@ -18,8 +18,8 @@ export default function LoginPage() {
     setErr('')
     setLoading(true)
     try {
-      const { data: tokens } = await authApi.login({ email, password })
-      setTokens(tokens.access_token, tokens.refresh_token)
+      const { data: tokens } = await authApi.login({ email, pwd: password })
+      setTokens(tokens.tok, tokens.ref)
       const { data: user } = await authApi.me()
       setUser(user)
       nav('/dashboard')

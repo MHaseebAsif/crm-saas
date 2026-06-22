@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { employeesApi, type EmployeePayload } from '../api/employees'
 import type { Employee } from '../types'
-import { Card } from '../components/ui/Card'
+
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Badge from '../components/ui/Badge'
@@ -64,13 +64,13 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Employees</h1>
           <p className="text-slate-400 mt-1">{total} total</p>
         </div>
-        <Button onClick={() => setOpen(true)}>Add Employee</Button>
+        <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">Add Employee</Button>
       </div>
 
       <form

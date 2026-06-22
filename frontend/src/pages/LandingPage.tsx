@@ -7,7 +7,7 @@ const features = [
   { title: 'Task Management', desc: 'Assign, track and complete tasks with priority levels.' },
   { title: 'Team Collaboration', desc: 'Manage employees and delegate work efficiently.' },
   { title: 'Real-time Notifications', desc: 'Stay updated with alerts for tasks and activities.' },
-  { title: 'Secure Auth', desc: 'JWT-based auth with OTP verification and refresh tokens.' },
+  { title: 'Secure Auth', desc: 'JWT RS256 auth with token rotation, refresh tokens, and password reset.' },
 ]
 
 export default function LandingPage() {

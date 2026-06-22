@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: postgres
+      POSTGRES_DB: crmdb
     ports:
       - "5432:5432"
     volumes:
@@ -28,7 +28,7 @@ services:
     volumes:
       - redis_data:/data
       - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--protected-mode", "no"]
     networks:
       - backend_network
     healthcheck:
@@ -149,12 +149,12 @@ services:
       retries: 3
 
   frontend:
-    image: node:18-alpine
-    command: ["sh", "-c", "echo 'ok' && tail -f /dev/null"]
+    build: ../../frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
     networks:
       - frontend_network
+      - backend_network
     healthcheck:
       test: ["CMD", "echo", "1"]
       interval: 5s

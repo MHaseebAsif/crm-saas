@@ -6,7 +6,7 @@ export const authApi = {
     client.post<TokenResponse>('/auth/login', data),
 
   signup: (data: SignupRequest) =>
-    client.post<{ message: string }>('/auth/signup', data),
+    client.post<{ message: string }>('/auth/reg', data),
 
   me: () => client.get<User>('/auth/me'),
 
@@ -18,9 +18,6 @@ export const authApi = {
 
   resetPassword: (token: string, password: string) =>
     client.post('/auth/reset-password', { token, new_password: password }),
-
-  verifyOtp: (email: string, otp: string) =>
-    client.post('/auth/verify-otp', { email, otp }),
 
   logout: () => client.post('/auth/logout'),
 }

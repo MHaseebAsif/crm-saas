@@ -65,7 +65,7 @@ export default function ProfilePage() {
   if (!user) return null
 
   return (
-    <div className="p-8 space-y-6 max-w-2xl">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-2xl mx-auto md:mx-0">
       <h1 className="text-2xl font-bold text-slate-100">Profile</h1>
 
       <Card>

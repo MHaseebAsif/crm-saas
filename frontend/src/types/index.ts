@@ -86,14 +86,14 @@ export interface ApiError {
 }
 
 export interface TokenResponse {
-  access_token: string
-  refresh_token: string
-  token_type: string
+  tok: string
+  ref: string
+  token_type?: string
 }
 
 export interface LoginRequest {
   email: string
-  password: string
+  pwd: string
 }
 
 export interface SignupRequest {

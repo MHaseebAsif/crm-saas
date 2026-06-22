@@ -1,6 +1,8 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class RegReq(BaseModel):
     email: str
-    pwd: str
-    tenant_id: str
+    password: str
+    full_name: str
+    tenant_name: Optional[str] = None

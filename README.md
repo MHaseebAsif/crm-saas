@@ -1,6 +1,99 @@
-# CRM SaaS Platform
+# CRM SaaS Platform - FastAPI + PostgreSQL (Docker/DevOps Assessment Project)
 
-A multi-tenant CRM platform built with a microservices architecture using FastAPI, PostgreSQL, Redis, RabbitMQ, Docker Swarm, and Kubernetes.
+A multi-tenant CRM platform built with a microservices architecture using FastAPI, PostgreSQL, Redis, RabbitMQ, Docker Swarm, and Kubernetes. This serves as a comprehensive Docker/DevOps assessment project.
+
+---
+
+## Docker Phases Completed
+
+- Phase 1: Containerized Architecture ✅
+- Phase 2: Custom Docker Images (multi-stage, non-root) ✅
+- Phase 3: Docker Hub (sajid1139/crm-*) ✅
+- Phase 4: Private Registry (localhost:5000) ✅
+- Phase 5: Docker Swarm ✅
+- Phase 6: Rolling Updates (v1.0.0 → v1.1.0) ✅
+- Phase 7: Docker Secrets ✅
+- Phase 8: Custom Networks (overlay) ✅
+- Phase 9: Persistent Storage (named volumes) ✅
+- Phase 10: Health Checks ✅
+- Phase 11: Monitoring (Prometheus + Grafana) ✅
+
+---
+
+## Quick Start
+
+To quickly start the project locally using Docker Compose, run:
+
+```bash
+cp backend/docker/.env.example backend/docker/.env
+docker-compose -f backend/docker/docker-compose.yml up -d --build
+```
+
+---
+
+## Docker Swarm Deployment
+
+To deploy the services to a Docker Swarm cluster:
+
+```bash
+docker swarm init
+docker stack deploy -c backend/docker-stack.yml crm
+docker stack services crm
+```
+
+---
+
+## Docker Hub Images
+
+The built images are available on Docker Hub under the `sajid1139` namespace:
+
+- [sajid1139/crm-frontend](https://hub.docker.com/r/sajid1139/crm-frontend)
+- [sajid1139/crm-auth-service](https://hub.docker.com/r/sajid1139/crm-auth-service)
+- [sajid1139/crm-user-service](https://hub.docker.com/r/sajid1139/crm-user-service)
+- [sajid1139/crm-crm-service](https://hub.docker.com/r/sajid1139/crm-crm-service)
+- [sajid1139/crm-notification-service](https://hub.docker.com/r/sajid1139/crm-notification-service)
+
+---
+
+## Services & Ports
+
+| Service              | Port    | Description                         |
+|----------------------|---------|-------------------------------------|
+| nginx                | 80/8080 | Reverse proxy and API gateway       |
+| frontend             | 3000    | Web UI built with React/Vite        |
+| auth-service         | 8001    | Authentication and JWT management   |
+| user-service         | 8002    | User and tenant management          |
+| crm-service          | 8003    | Core CRM logic (customers, tasks)   |
+| notification-service | 8004    | Email and WebSocket notifications   |
+| postgresql           | 5432    | Relational database                 |
+| redis                | 6379    | In-memory caching                   |
+| rabbitmq             | 5672    | Message broker (AMQP)               |
+| rabbitmq (mgmt)      | 15672   | RabbitMQ Management UI              |
+| prometheus           | 9090    | Metrics collection                  |
+| grafana              | 3001    | Metrics visualization               |
+
+---
+
+## Monitoring
+
+The project uses Prometheus and Grafana for comprehensive monitoring.
+
+| Service    | URL                          | Default Credentials |
+|------------|------------------------------|---------------------|
+| Prometheus | http://localhost:9090        | none                |
+| Grafana    | http://localhost:3001        | admin / adminpass   |
+
+Prometheus runs on `localhost:9090` and scrapes metrics from the various services and infrastructure components.
+Grafana runs on `localhost:3001` and connects to Prometheus to visualize these metrics.
+
+Dashboards available after login:
+- Services Overview: CPU, Memory, Network, Request Count
+- Container Health: restarts, uptime, running containers
+
+Alerts configured:
+- ServiceDown: fires if any service is unreachable for 1 minute
+- HighCPUUsage: fires if CPU exceeds 80% for 2 minutes
+- HighMemoryUsage: fires if memory exceeds 512MB for 2 minutes
 
 ---
 
@@ -58,28 +151,6 @@ A multi-tenant CRM platform built with a microservices architecture using FastAP
 
 ---
 
-## Run Locally
-
-```bash
-cp backend/docker/.env.example backend/docker/.env
-docker compose -f backend/docker/docker-compose.yml up --build
-```
-
-Service endpoints:
-
-| Service              | URL                        |
-|----------------------|----------------------------|
-| nginx                | http://localhost:80        |
-| auth-service         | http://localhost:8001      |
-| user-service         | http://localhost:8002      |
-| crm-service          | http://localhost:8003      |
-| notification-service | http://localhost:8004      |
-| RabbitMQ management  | http://localhost:15672     |
-| Prometheus           | http://localhost:9090      |
-| Grafana              | http://localhost:3001      |
-
----
-
 ## Docker Hub Push
 
 ```bash
@@ -104,7 +175,7 @@ bash backend/scripts/private-registry-push.sh
 
 ---
 
-## Docker Swarm Deploy
+## Docker Swarm Script Deploy
 
 ```bash
 bash backend/scripts/swarm-init.sh
@@ -191,24 +262,6 @@ curl http://localhost:8003/health
 curl http://localhost:8004/health
 curl http://localhost:80/health
 ```
-
----
-
-## Monitoring
-
-| Service    | URL                          | Default Credentials |
-|------------|------------------------------|---------------------|
-| Prometheus | http://localhost:9090        | none                |
-| Grafana    | http://localhost:3001        | admin / adminpass   |
-
-Dashboards available after login:
-- Services Overview: CPU, Memory, Network, Request Count
-- Container Health: restarts, uptime, running containers
-
-Alerts configured:
-- ServiceDown: fires if any service is unreachable for 1 minute
-- HighCPUUsage: fires if CPU exceeds 80% for 2 minutes
-- HighMemoryUsage: fires if memory exceeds 512MB for 2 minutes
 
 ---
 

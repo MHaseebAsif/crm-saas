@@ -44,8 +44,8 @@ export default function AuthLayout() {
           &copy; {new Date().getFullYear()} CRM SaaS. All rights reserved.
         </div>
       </div>
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
+      <div className="flex-1 flex items-center justify-center px-4">
+        <div className="w-full max-w-md mx-auto">
           <Outlet />
         </div>
       </div>

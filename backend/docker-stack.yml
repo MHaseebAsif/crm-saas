@@ -30,10 +30,8 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_PASSWORD: securepass
       POSTGRES_DB: postgres
-    secrets:
-      - db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -62,7 +60,7 @@ services:
       - redis_password
     volumes:
       - redis_data:/data
-    command: ["sh", "-c", "redis-server --requirepass $(cat /run/secrets/redis_password)"]
+    command: ["sh", "-c", "redis-server --requirepass $$(cat /run/secrets/redis_password)"]
     networks:
       - backend_network
     deploy:
@@ -113,7 +111,9 @@ services:
       retries: 5
 
   auth-service:
-    image: crm-saas/auth-service:latest
+    image: localhost:5000/crm-auth-service:v1.0.0
+    environment:
+      DB_URL: postgres://admin:securepass@postgresql:5432/postgres
     secrets:
       - db_password
       - jwt_secret
@@ -140,7 +140,9 @@ services:
       retries: 3
 
   user-service:
-    image: crm-saas/user-service:latest
+    image: localhost:5000/crm-user-service:v1.0.0
+    environment:
+      DB_URL: postgres://admin:securepass@postgresql:5432/postgres
     secrets:
       - db_password
       - redis_password
@@ -166,7 +168,9 @@ services:
       retries: 3
 
   crm-service:
-    image: crm-saas/crm-service:latest
+    image: localhost:5000/crm-crm-service:v1.0.0
+    environment:
+      DB_URL: postgres://admin:securepass@postgresql:5432/postgres
     secrets:
       - db_password
       - jwt_secret
@@ -193,7 +197,9 @@ services:
       retries: 3
 
   notification-service:
-    image: crm-saas/notification-service:latest
+    image: localhost:5000/crm-notification-service:v1.0.0
+    environment:
+      DB_URL: postgres://admin:securepass@postgresql:5432/postgres
     secrets:
       - db_password
       - redis_password
@@ -219,7 +225,7 @@ services:
       retries: 3
 
   frontend:
-    image: crm-saas/frontend:latest
+    image: localhost:5000/crm-frontend:v1.0.0
     networks:
       - frontend_network
     deploy:
@@ -234,14 +240,10 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+
 
   nginx:
-    image: crm-saas/nginx:latest
+    image: localhost:5000/crm-nginx:v1.0.0
     ports:
       - "80:8080"
     networks:

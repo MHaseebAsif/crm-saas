@@ -54,7 +54,7 @@ export default function DashboardPage() {
   }, [role])
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-100">Dashboard</h1>
         <p className="text-slate-400 mt-1">
@@ -67,7 +67,7 @@ export default function DashboardPage() {
           <Spinner size="lg" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((s) => (
             <Link key={s.label} to={s.link}>
               <Card className="hover:border-slate-600 transition-all duration-200 cursor-pointer group">

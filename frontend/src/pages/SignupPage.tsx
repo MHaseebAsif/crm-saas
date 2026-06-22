@@ -24,10 +24,16 @@ export default function SignupPage() {
     setLoading(true)
     try {
       await authApi.signup(form)
-      nav('/verify-otp', { state: { email: form.email } })
+      nav('/login')
     } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setErr(msg || 'Registration failed')
+      const detail = (e as any)?.response?.data?.detail
+      let msg = 'Registration failed'
+      if (typeof detail === 'string') {
+        msg = detail
+      } else if (Array.isArray(detail)) {
+        msg = detail.map((d: any) => d.msg).join(', ')
+      }
+      setErr(msg)
     } finally {
       setLoading(false)
     }

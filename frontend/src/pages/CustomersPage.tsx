@@ -65,13 +65,13 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Customers</h1>
           <p className="text-slate-400 mt-1">{total} total</p>
         </div>
-        <Button onClick={() => setOpen(true)}>Add Customer</Button>
+        <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">Add Customer</Button>
       </div>
 
       <form onSubmit={onSearch} className="flex gap-3 max-w-md">
@@ -99,9 +99,12 @@ export default function CustomersPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-700">
-                  {['Name', 'Email', 'Company', 'Status', 'Created', ''].map((h) => (
-                    <th key={h} className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">{h}</th>
-                  ))}
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Name</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Email</th>
+                  <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Company</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Status</th>
+                  <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Created</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -109,11 +112,11 @@ export default function CustomersPage() {
                   <tr key={c.id} className="hover:bg-slate-700/30 transition-colors">
                     <td className="px-6 py-4 text-sm font-medium text-slate-100">{c.name}</td>
                     <td className="px-6 py-4 text-sm text-slate-400">{c.email}</td>
-                    <td className="px-6 py-4 text-sm text-slate-400">{c.company || '-'}</td>
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{c.company || '-'}</td>
                     <td className="px-6 py-4">
                       <Badge variant={statusVariant[c.status]}>{c.status}</Badge>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-400">{fmt(c.created_at)}</td>
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{fmt(c.created_at)}</td>
                     <td className="px-6 py-4">
                       <Link to={`/customers/${c.id}`} className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors">View</Link>
                     </td>

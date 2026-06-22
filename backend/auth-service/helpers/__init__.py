@@ -1,6 +1,5 @@
 from .jwt_helper import *
 from .password_helper import *
-from .otp_helper import *
 from .redis_helper import *
 from .rate_limit_helper import *
 from .rbac_helper import *
@@ -8,3 +7,4 @@ from .auth_dependencies import *
 from .event_publisher import *
 from .event_consumer import *
 from .security_middleware import *
+from .email_helper import *

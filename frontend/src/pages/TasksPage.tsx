@@ -10,12 +10,7 @@ import Spinner from '../components/ui/Spinner'
 import EmptyState from '../components/ui/EmptyState'
 import { fmt } from '../lib/utils'
 
-const statusVariant: Record<TaskStatus, 'default' | 'info' | 'success' | 'danger'> = {
-  pending: 'default',
-  in_progress: 'info',
-  completed: 'success',
-  cancelled: 'danger',
-}
+
 
 const priorityVariant: Record<TaskPriority, 'default' | 'warning' | 'danger'> = {
   low: 'default',
@@ -92,16 +87,16 @@ export default function TasksPage() {
   ]
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Tasks</h1>
           <p className="text-slate-400 mt-1">{total} total</p>
         </div>
-        <Button onClick={() => setOpen(true)}>New Task</Button>
+        <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">New Task</Button>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 overflow-x-auto flex-nowrap whitespace-nowrap pb-2">
         {statuses.map((s) => (
           <button
             key={s.v}
@@ -131,9 +126,12 @@ export default function TasksPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-700">
-                  {['Title', 'Priority', 'Status', 'Assigned To', 'Due Date', ''].map((h) => (
-                    <th key={h} className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">{h}</th>
-                  ))}
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Title</th>
+                  <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Priority</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Status</th>
+                  <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Assigned To</th>
+                  <th className="hidden lg:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Due Date</th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -143,7 +141,7 @@ export default function TasksPage() {
                       <p className="text-sm font-medium text-slate-100">{t.title}</p>
                       {t.description && <p className="text-xs text-slate-500 mt-0.5 truncate max-w-xs">{t.description}</p>}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden md:table-cell px-6 py-4">
                       <Badge variant={priorityVariant[t.priority]}>{t.priority}</Badge>
                     </td>
                     <td className="px-6 py-4">
@@ -158,8 +156,8 @@ export default function TasksPage() {
                         <option value="cancelled">Cancelled</option>
                       </select>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-400">{t.assigned_to_name || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-slate-400">{t.due_date ? fmt(t.due_date) : '-'}</td>
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{t.assigned_to_name || '-'}</td>
+                    <td className="hidden lg:table-cell px-6 py-4 text-sm text-slate-400">{t.due_date ? fmt(t.due_date) : '-'}</td>
                     <td className="px-6 py-4">
                       <button onClick={() => del(t.id)} className="text-xs text-red-400 hover:text-red-300 transition-colors">Delete</button>
                     </td>

@@ -7,7 +7,6 @@ TORTOISE_ORM = {
             "models": [
                 "models.user_models",
                 "models.rbac_models",
-                "models.otp_models",
                 "models.token_models",
                 "aerich.models"
             ],

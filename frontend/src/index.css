@@ -1,49 +1,7 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --surface: #0f172a;
-  --surface-2: #1e293b;
-  --surface-3: #334155;
-  --border: #334155;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-}
-
-* {
-  box-sizing: border-box;
+html, body, #root {
+  height: 100%;
   margin: 0;
   padding: 0;
-}
-
-html, body {
-  height: 100%;
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: var(--surface);
-  color: var(--text);
-  -webkit-font-smoothing: antialiased;
-}
-
-#root {
-  height: 100%;
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--surface-2);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--surface-3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
 }

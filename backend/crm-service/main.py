@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from configs.settings import SETTINGS
 from controllers.customer_controller import r as c_r
@@ -8,6 +9,15 @@ from controllers.websocket_controller import r as w_r
 from controllers.health_controller import r as h_r
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"],
+    allow_headers=["*"],
+)
+
 app.include_router(c_r, prefix="/customers")
 app.include_router(e_r, prefix="/employees")
 app.include_router(t_r, prefix="/tasks")

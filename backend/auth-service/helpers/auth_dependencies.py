@@ -2,10 +2,10 @@ from fastapi import Depends, HTTPException, Header
 from .jwt_helper import dec_tok
 from .rbac_helper import check_role
 
-def get_tok(auth: str = Header(None)) -> str:
-    if not auth or not auth.startswith("Bearer "):
+def get_tok(authorization: str = Header(None)) -> str:
+    if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(401, "No auth")
-    return auth.split(" ")[1]
+    return authorization.split(" ")[1]
 
 def get_usr(tok: str = Depends(get_tok)) -> dict:
     try:

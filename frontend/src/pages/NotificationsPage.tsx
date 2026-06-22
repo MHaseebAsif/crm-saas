@@ -58,8 +58,8 @@ export default function NotificationsPage() {
   const unread = items.filter((n) => !n.is_read).length
 
   return (
-    <div className="p-8 space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-3xl mx-auto md:mx-0">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-100">Notifications</h1>
           <p className="text-slate-400 mt-1">
@@ -67,7 +67,7 @@ export default function NotificationsPage() {
           </p>
         </div>
         {unread > 0 && (
-          <Button variant="secondary" size="sm" onClick={markAll} loading={marking}>
+          <Button variant="secondary" size="sm" onClick={markAll} loading={marking} className="w-full sm:w-auto">
             Mark all read
           </Button>
         )}

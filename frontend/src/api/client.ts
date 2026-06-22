@@ -1,14 +1,28 @@
+/// <reference types="vite/client" />
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
 
-const BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1'
-
 export const client = axios.create({
-  baseURL: BASE,
   headers: { 'Content-Type': 'application/json' },
 })
 
 client.interceptors.request.use((cfg) => {
+  const url = cfg.url || ''
+  if (url.startsWith('/auth')) {
+    cfg.baseURL = import.meta.env.VITE_AUTH_URL
+  } else if (url.startsWith('/users')) {
+    cfg.baseURL = import.meta.env.VITE_USER_URL
+  } else if (url.startsWith('/notifications')) {
+    cfg.baseURL = import.meta.env.VITE_NOTIFICATION_URL
+  } else if (
+    url.startsWith('/customers') ||
+    url.startsWith('/tenants') ||
+    url.startsWith('/tasks') ||
+    url.startsWith('/employees')
+  ) {
+    cfg.baseURL = import.meta.env.VITE_CRM_URL
+  }
+
   const token = useAuthStore.getState().token
   if (token) cfg.headers.Authorization = `Bearer ${token}`
   return cfg
@@ -25,7 +39,7 @@ client.interceptors.response.use(
       return Promise.reject(err)
     }
     orig._retry = true
-    const { refreshToken, token, logout, setTokens } = useAuthStore.getState()
+    const { refreshToken, logout, setTokens } = useAuthStore.getState()
     if (!refreshToken) {
       logout()
       return Promise.reject(err)
@@ -40,12 +54,13 @@ client.interceptors.response.use(
     }
     refreshing = true
     try {
-      const res = await axios.post(`${BASE}/auth/refresh`, { refresh_token: refreshToken })
-      const { access_token, refresh_token } = res.data
-      setTokens(access_token, refresh_token)
-      queue.forEach((p) => p.resolve(access_token))
+      const authUrl = import.meta.env.VITE_AUTH_URL || ''
+      const res = await axios.post(`${authUrl}/auth/refresh`, { refresh_token: refreshToken })
+      const { tok, ref } = res.data
+      setTokens(tok, ref)
+      queue.forEach((p) => p.resolve(tok))
       queue = []
-      orig.headers.Authorization = `Bearer ${access_token}`
+      orig.headers.Authorization = `Bearer ${tok}`
       return client(orig)
     } catch (e) {
       queue.forEach((p) => p.reject(e))
@@ -55,7 +70,6 @@ client.interceptors.response.use(
     } finally {
       refreshing = false
     }
-    void token
   },
 )
 
