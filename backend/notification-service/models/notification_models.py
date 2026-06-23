@@ -4,6 +4,6 @@ class Notification(models.Model):
     id = fields.UUIDField(pk=True)
     tenant_id = fields.UUIDField(index=True)
     type = fields.CharField(max_length=50)
-    status = fields.CharField(max_length=20)
+    is_read = fields.BooleanField(default=False)
     recipient = fields.CharField(max_length=255)
-    content = fields.TextField()
+    message = fields.TextField()

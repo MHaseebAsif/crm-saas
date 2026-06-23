@@ -9,6 +9,8 @@ from controllers.websocket_controller import r as w_r
 from controllers.health_controller import r as h_r
 
 app = FastAPI()
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,27 +1,33 @@
 import math
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Header, Depends
 from schemas.notification_schemas import NotifReq, BaseRes
 from services.notification_service import send_notif
 from models.notification_models import Notification
+from configs.settings import SETTINGS
 
 r = APIRouter()
+
+def get_tnt(x_tenant_id: str = Header(None)) -> str:
+    if not x_tenant_id:
+        raise HTTPException(401, "No tenant")
+    return x_tenant_id
 
 @r.get("/")
 async def list_notifs(
     page: int = Query(1, ge=1),
     size: int = Query(20, ge=1, le=100),
-    tid: str = Query(...),
+    tid: str = Depends(get_tnt),
 ):
     total = await Notification.filter(tenant_id=tid).count()
     rows = await Notification.filter(tenant_id=tid).offset((page - 1) * size).limit(size)
     items = [
         {
             "id": str(n.id),
-            "user_id": n.recipient,
-            "title": n.type,
-            "message": n.content,
-            "is_read": n.status == "read",
-            "created_at": "",
+            "tenant_id": str(n.tenant_id),
+            "type": n.type,
+            "status": "read" if n.is_read else "sent",
+            "recipient": n.recipient,
+            "content": n.message,
         }
         for n in rows
     ]
@@ -36,13 +42,13 @@ async def mark_read(nid: str):
     n = await Notification.get_or_none(id=nid)
     if not n:
         raise HTTPException(404, "Not found")
-    n.status = "read"
+    n.is_read = True
     await n.save()
     return BaseRes(msg="ok")
 
 @r.post("/read-all", response_model=BaseRes)
 async def mark_all_read(tid: str = Query(...)):
-    await Notification.filter(tenant_id=tid, status="sent").update(status="read")
+    await Notification.filter(tenant_id=tid, is_read=False).update(is_read=True)
     return BaseRes(msg="ok")
 
 @r.delete("/{nid}", response_model=BaseRes)

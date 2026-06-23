@@ -130,6 +130,8 @@ services:
     ports:
       - "8004:8000"
     env_file: .env
+    environment:
+      PUB_KEY: ${PUB_KEY}
     volumes:
       - ./scripts/service-entrypoint.sh:/app/service-entrypoint.sh
     command: ["/bin/sh", "/app/service-entrypoint.sh"]
@@ -190,6 +192,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     networks:
       - monitoring_network
@@ -219,6 +222,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: docker-node-exporter-1
+    restart: unless-stopped
+    networks:
+      - backend_network
 
 networks:
   frontend_network:

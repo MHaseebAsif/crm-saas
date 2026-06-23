@@ -13,9 +13,9 @@ async def proc_msg(b: bytes):
         id=uuid.uuid4(),
         tenant_id=tid,
         type="Welcome",
-        status="sent",
+        is_read=False,
         recipient=email,
-        content="Your account has been created.",
+        message="Your account has been created.",
     )
     try:
         await send_mail(email, "Welcome", "Your account has been created.")
@@ -23,4 +23,11 @@ async def proc_msg(b: bytes):
         pass
 
 async def start_cons():
-    await cons_evt("notif_q", "auth_events", "user.signup", proc_msg)
+    try:
+        print("Starting RabbitMQ consumer...")
+        from configs.rabbitmq import get_rmq
+        conn = await get_rmq()
+        print("Connected to RabbitMQ")
+        await cons_evt("notif_q", "auth_events", "user.signup", proc_msg)
+    except Exception as e:
+        print(f"RabbitMQ consumer error: {e}")
