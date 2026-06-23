@@ -27,7 +27,7 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState<TaskPayload>({ title: '' })
+  const [form, setForm] = useState<TaskPayload>({ title: '', priority: 'medium' })
   const [err, setErr] = useState('')
   const [employees, setEmployees] = useState<{id: string, name: string}[]>([])
 
@@ -67,7 +67,7 @@ export default function TasksPage() {
       })
       await tasksApi.create(payload as TaskPayload)
       setOpen(false)
-      setForm({ title: '' })
+      setForm({ title: '', priority: 'medium' })
       load()
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -97,7 +97,6 @@ export default function TasksPage() {
     { v: 'pending', l: 'Pending' },
     { v: 'in_progress', l: 'In Progress' },
     { v: 'completed', l: 'Completed' },
-    { v: 'cancelled', l: 'Cancelled' },
   ]
 
   return (

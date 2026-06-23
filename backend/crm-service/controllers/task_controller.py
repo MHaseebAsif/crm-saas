@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 from fastapi import APIRouter, Depends
 from schemas.task_schemas import TaskCreate, TaskReq, TaskListRes
 from schemas.customer_schemas import BaseRes
@@ -9,23 +10,26 @@ from models.task_models import Task
 r = APIRouter()
 
 @r.get("", response_model=TaskListRes)
-async def list_tasks(page: int = 1, size: int = 10, tid: str = Depends(get_tnt)):
-    total = await Task.filter(tenant_id=tid).count()
-    tasks = await Task.filter(tenant_id=tid).offset((page - 1) * size).limit(size)
+async def list_tasks(page: int = 1, size: int = 10, status: Optional[str] = None, tid: str = Depends(get_tnt)):
+    qs = Task.filter(tenant_id=tid)
+    if status:
+        qs = qs.filter(status=status)
+    total = await qs.count()
+    tasks = await qs.offset((page - 1) * size).limit(size)
     items = []
     for t in tasks:
         items.append({
             "id": str(t.id),
             "tenant_id": str(t.tenant_id),
             "title": t.title,
-            "description": None,
+            "description": t.description,
             "status": t.status,
-            "priority": "medium",
+            "priority": t.priority,
             "assigned_to": str(t.assigned_to) if t.assigned_to else None,
             "assigned_to_name": None,
             "customer_id": None,
             "customer_name": None,
-            "due_date": None,
+            "due_date": t.due_date.isoformat() if t.due_date else None,
             "created_at": "",
             "updated_at": "",
         })
@@ -58,19 +62,25 @@ async def patch_task(tid_param: str, req: TaskPatchReq, tid: str = Depends(get_t
         t.status = req.status
     if req.assigned_to is not None:
         t.assigned_to = req.assigned_to
+    if req.description is not None:
+        t.description = req.description
+    if req.priority is not None:
+        t.priority = req.priority
+    if req.due_date is not None:
+        t.due_date = req.due_date
     await t.save()
     return {
         "id": str(t.id),
         "tenant_id": str(t.tenant_id),
         "title": t.title,
-        "description": req.description,
+        "description": t.description,
         "status": t.status,
-        "priority": req.priority or "medium",
+        "priority": t.priority,
         "assigned_to": str(t.assigned_to) if t.assigned_to else None,
         "assigned_to_name": None,
         "customer_id": None,
         "customer_name": None,
-        "due_date": req.due_date,
+        "due_date": t.due_date.isoformat() if t.due_date else None,
         "created_at": "",
         "updated_at": "",
     }

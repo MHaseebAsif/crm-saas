@@ -11,6 +11,7 @@ async def add_task(req: TaskCreate, tid: str) -> BaseRes:
         description=req.description,
         due_date=req.due_date,
         assigned_to=req.assigned_to,
+        priority=req.priority,
         status="pending"
     )
     return BaseRes(msg="ok")

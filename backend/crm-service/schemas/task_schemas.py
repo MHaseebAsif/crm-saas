@@ -12,9 +12,10 @@ from datetime import date
 
 class TaskCreate(BaseModel):
     title: str
-    description: str
-    due_date: date
+    description: Optional[str] = None
+    due_date: Optional[date] = None
     assigned_to: Optional[str] = None
+    priority: Optional[str] = "medium"
 
 class TaskItem(BaseModel):
     id: str
