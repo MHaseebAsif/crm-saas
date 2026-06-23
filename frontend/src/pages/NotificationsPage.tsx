@@ -47,49 +47,73 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (!tenantId) return
-    const ws = new WebSocket(`${WS_BASE}/notifications/ws/${tenantId}`)
-    wsRef.current = ws
-    ws.onmessage = (evt) => {
+    let retryCount = 0
+    let timeout: ReturnType<typeof setTimeout>
+
+    const connect = () => {
       try {
-        const raw = JSON.parse(evt.data) as {
-          id: string; type: string; title: string; message: string; is_read: boolean; created_at: string | null
+        const ws = new WebSocket(`${WS_BASE}/notifications/ws/${tenantId}`)
+        wsRef.current = ws
+
+        ws.onopen = () => {
+          retryCount = 0
         }
-        const notif: Notification = {
-          id: raw.id,
-          user_id: tenantId,
-          title: raw.title || raw.type,
-          message: raw.message,
-          is_read: false,
-          created_at: raw.created_at ?? new Date().toISOString(),
+
+        ws.onmessage = (evt) => {
+          try {
+            const raw = JSON.parse(evt.data) as {
+              id: string; type: string; title: string; message: string; is_read: boolean; created_at: string | null
+            }
+            const notif: Notification = {
+              id: raw.id,
+              user_id: tenantId,
+              title: raw.title || raw.type,
+              message: raw.message,
+              is_read: false,
+              created_at: raw.created_at ?? new Date().toISOString(),
+            }
+            setItems((prev) => [notif, ...prev])
+            setTotal((t) => t + 1)
+            toast.custom(
+              (t) => (
+                <div
+                  className={cn('flex gap-3 items-start max-w-sm', t.visible ? 'animate-enter' : 'animate-leave')}
+                  style={{
+                    background: 'rgba(10,8,30,0.85)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(99,102,241,0.4)',
+                    borderRadius: 14,
+                    padding: '12px 16px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  }}
+                >
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', boxShadow: '0 0 8px #6366f1', marginTop: 4, flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{notif.title}</p>
+                    {notif.message && notif.message !== notif.title && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{notif.message}</p>}
+                  </div>
+                </div>
+              ),
+              { duration: 4000 }
+            )
+          } catch (_) {}
         }
-        setItems((prev) => [notif, ...prev])
-        setTotal((t) => t + 1)
-        toast.custom(
-          (t) => (
-            <div
-              className={cn('flex gap-3 items-start max-w-sm', t.visible ? 'animate-enter' : 'animate-leave')}
-              style={{
-                background: 'rgba(10,8,30,0.85)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(99,102,241,0.4)',
-                borderRadius: 14,
-                padding: '12px 16px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-              }}
-            >
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', boxShadow: '0 0 8px #6366f1', marginTop: 4, flexShrink: 0 }} />
-              <div style={{ minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{notif.title}</p>
-                {notif.message && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{notif.message}</p>}
-              </div>
-            </div>
-          ),
-          { duration: 4000 }
-        )
+        ws.onerror = () => {}
+        ws.onclose = () => {
+          if (retryCount < 3) {
+            retryCount++
+            timeout = setTimeout(connect, 5000)
+          }
+        }
       } catch (_) {}
     }
-    ws.onerror = () => {}
-    return () => { ws.close() }
+
+    connect()
+
+    return () => {
+      clearTimeout(timeout)
+      if (wsRef.current) wsRef.current.close()
+    }
   }, [tenantId])
 
   const markRead = async (id: string) => {
@@ -121,7 +145,7 @@ export default function NotificationsPage() {
   const unread = items.filter((n) => !n.is_read).length
 
   return (
-    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6 max-w-3xl mx-auto md:mx-0">
+    <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 style={gradientTitle}>Notifications</h1>
@@ -173,7 +197,7 @@ export default function NotificationsPage() {
                     >
                       <td style={{ padding: '14px 24px', textAlign: 'left' }}>
                         <p style={{ fontSize: 13, fontWeight: n.is_read ? 500 : 600, color: n.is_read ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.9)' }}>{n.title}</p>
-                        {n.message && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{n.message}</p>}
+                        {n.message && n.message !== n.title && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{n.message}</p>}
                       </td>
                       <td style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'left' }}>
                         {fmtDateTime(n.created_at)}
