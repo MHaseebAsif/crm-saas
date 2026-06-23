@@ -13,6 +13,7 @@ import TenantsPage from './pages/TenantsPage'
 import TenantDetailPage from './pages/TenantDetailPage'
 import NotificationsPage from './pages/NotificationsPage'
 import ProfilePage from './pages/ProfilePage'
+import SystemHealthPage from './pages/SystemHealthPage'
 import AppLayout from './components/layout/AppLayout'
 import AuthLayout from './components/layout/AuthLayout'
 import ProtectedRoute from './routes/ProtectedRoute'
@@ -39,6 +40,7 @@ export default function App() {
             <Route path="/tenants/:id" element={<ProtectedRoute roles={['super_admin']}><TenantDetailPage /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute roles={['employee', 'company_admin']}><NotificationsPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/system-health" element={<SystemHealthPage />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
