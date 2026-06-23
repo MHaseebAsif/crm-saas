@@ -103,7 +103,7 @@ export default function EmployeesPage() {
                 <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Name</th>
                 <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Email</th>
                 <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Role</th>
-                <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4"></th>
+                <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">

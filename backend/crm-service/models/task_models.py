@@ -6,3 +6,6 @@ class Task(models.Model):
     title = fields.CharField(max_length=100)
     status = fields.CharField(max_length=20)
     assigned_to = fields.UUIDField(null=True)
+    due_date = fields.DateField(null=True)
+    priority = fields.CharField(max_length=20, default="medium")
+    description = fields.TextField(null=True)

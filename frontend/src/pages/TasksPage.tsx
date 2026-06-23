@@ -46,12 +46,10 @@ export default function TasksPage() {
   useEffect(() => { load() }, [page, filter])
 
   useEffect(() => {
-    if (open) {
-      getEmployees()
-        .then((res) => setEmployees((res.data.items || []).map(e => ({ id: e.id, name: e.name }))))
-        .catch(() => setEmployees([]))
-    }
-  }, [open])
+    getEmployees()
+      .then((res) => setEmployees((res.data.items || []).map(e => ({ id: e.id, name: e.name }))))
+      .catch(() => setEmployees([]))
+  }, [])
 
   const set = (k: keyof TaskPayload) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -171,7 +169,7 @@ export default function TasksPage() {
                         <option value="completed">Completed</option>
                       </select>
                     </td>
-                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{t.assigned_to || '-'}</td>
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{t.assigned_to ? (employees.find(e => e.id === t.assigned_to)?.name || t.assigned_to) : '-'}</td>
                     <td className="hidden lg:table-cell px-6 py-4 text-sm text-slate-400">{t.due_date ? new Date(t.due_date).toLocaleDateString() : '-'}</td>
                     <td className="px-6 py-4">
                       <button onClick={() => del(t.id)} className="text-xs text-red-400 hover:text-red-300 transition-colors">Delete</button>
