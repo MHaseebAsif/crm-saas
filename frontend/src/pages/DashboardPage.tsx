@@ -254,7 +254,7 @@ export default function DashboardPage() {
                       color: '#e2e8f0',
                       fontSize: 12,
                     }}
-                    formatter={(value: number) => [`${value}%`, 'CPU']}
+                    formatter={(value) => [`${Number(value).toFixed(1)}%`, 'CPU']}
                   />
                   <Line
                     type="monotone"
