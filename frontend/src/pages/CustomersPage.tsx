@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { customersApi, type CustomerPayload } from '../api/customers'
 import type { Customer } from '../types'
 import { Card } from '../components/ui/Card'
@@ -9,7 +8,6 @@ import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import Spinner from '../components/ui/Spinner'
 import EmptyState from '../components/ui/EmptyState'
-import { fmt } from '../lib/utils'
 
 const statusVariant = { active: 'success', inactive: 'default', lead: 'warning' } as const
 
@@ -21,6 +19,7 @@ export default function CustomersPage() {
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [viewCustomer, setViewCustomer] = useState<Customer | null>(null)
   const [form, setForm] = useState<CustomerPayload>({ name: '', email: '' })
   const [err, setErr] = useState('')
 
@@ -116,9 +115,9 @@ export default function CustomersPage() {
                     <td className="px-6 py-4">
                       <Badge variant={statusVariant[c.status]}>{c.status}</Badge>
                     </td>
-                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{fmt(c.created_at)}</td>
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{c?.created_at ? new Date(c.created_at).toLocaleDateString() : '-'}</td>
                     <td className="px-6 py-4">
-                      <Link to={`/customers/${c.id}`} className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors">View</Link>
+                      <button onClick={() => setViewCustomer(c)} className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors">View</button>
                     </td>
                   </tr>
                 ))}
@@ -167,6 +166,34 @@ export default function CustomersPage() {
             </select>
           </div>
         </div>
+      </Modal>
+
+      <Modal
+        open={!!viewCustomer}
+        onClose={() => setViewCustomer(null)}
+        title="Customer Details"
+        footer={<Button onClick={() => setViewCustomer(null)}>Close</Button>}
+      >
+        {viewCustomer && (
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm text-slate-400">Name</p>
+              <p className="text-slate-100 font-medium">{viewCustomer.name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-400">Email</p>
+              <p className="text-slate-100">{viewCustomer.email}</p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-400">Company</p>
+              <p className="text-slate-100">{viewCustomer.company || '-'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-slate-400">Status</p>
+              <Badge variant={statusVariant[viewCustomer.status]}>{viewCustomer.status}</Badge>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )

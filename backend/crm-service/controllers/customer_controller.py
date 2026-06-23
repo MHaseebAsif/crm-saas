@@ -37,6 +37,25 @@ async def list_custs(
     ]
     return {"items": items, "total": total, "page": page, "size": size, "pages": math.ceil(total / size) if size > 0 else 0}
 
+@r.get("/{id}")
+async def get_cust(id: str, tid: str = Depends(get_tnt)):
+    from fastapi import HTTPException
+    c = await Customer.get_or_none(id=id, tenant_id=tid)
+    if not c:
+        raise HTTPException(404, "Not found")
+    return {
+        "id": str(c.id),
+        "tenant_id": str(c.tenant_id),
+        "name": c.name,
+        "email": c.email,
+        "phone": None,
+        "company": None,
+        "status": "lead",
+        "notes": None,
+        "created_at": "",
+        "updated_at": "",
+    }
+
 @r.post("", response_model=BaseRes)
 async def mk_cust(req: CustReq, tid: str = Depends(get_tnt)):
     return await add_cust(req, tid)
