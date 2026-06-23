@@ -7,3 +7,6 @@ class User(models.Model):
     pwd_hash = fields.CharField(max_length=255)
     is_act = fields.BooleanField(default=True)
     role_id = fields.UUIDField(null=True)
+
+    class Meta:
+        table = "users"

@@ -25,8 +25,8 @@ async def list_emps(
         {
             "id": str(e.id),
             "tenant_id": str(e.tenant_id),
-            "user_id": str(e.user_id),
-            "full_name": e.name,
+            "user_id": str(e.user_id) if e.user_id else None,
+            "name": e.name,
             "email": "",
             "department": None,
             "position": None,

@@ -23,3 +23,6 @@ export const employeesApi = {
 
   delete: (id: string) => client.delete(`/employees/${id}`),
 }
+
+export const getEmployees = () =>
+  client.get<PaginatedResponse<Employee>>('/employees', { params: { page: 1, size: 100 } })

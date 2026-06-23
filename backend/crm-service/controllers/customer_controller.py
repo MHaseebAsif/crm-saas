@@ -48,10 +48,10 @@ class CustPatchReq(BaseModel):
     phone: Optional[str] = None
     status: Optional[str] = None
 
-@r.patch("/{cid}")
-async def patch_cust(cid: str, req: CustPatchReq, tid: str = Depends(get_tnt)):
+@r.patch("/{id}")
+async def patch_cust(id: str, req: CustPatchReq, tid: str = Depends(get_tnt)):
     from fastapi import HTTPException
-    c = await Customer.get_or_none(id=cid, tenant_id=tid)
+    c = await Customer.get_or_none(id=id, tenant_id=tid)
     if not c:
         raise HTTPException(404, "Not found")
     if req.name is not None:
@@ -72,10 +72,10 @@ async def patch_cust(cid: str, req: CustPatchReq, tid: str = Depends(get_tnt)):
         "updated_at": "",
     }
 
-@r.delete("/{cid}", response_model=BaseRes)
-async def del_cust(cid: str, tid: str = Depends(get_tnt)):
+@r.delete("/{id}", response_model=BaseRes)
+async def del_cust(id: str, tid: str = Depends(get_tnt)):
     from fastapi import HTTPException
-    c = await Customer.get_or_none(id=cid, tenant_id=tid)
+    c = await Customer.get_or_none(id=id, tenant_id=tid)
     if not c:
         raise HTTPException(404, "Not found")
     await c.delete()

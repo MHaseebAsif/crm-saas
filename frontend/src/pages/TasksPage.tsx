@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { tasksApi, type TaskPayload } from '../api/tasks'
+import { getEmployees } from '../api/employees'
 import type { Task, TaskStatus, TaskPriority } from '../types'
 import { Card } from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -28,6 +29,7 @@ export default function TasksPage() {
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<TaskPayload>({ title: '' })
   const [err, setErr] = useState('')
+  const [employees, setEmployees] = useState<{id: string, name: string}[]>([])
 
   const load = async (p = page, s = filter) => {
     setLoading(true)
@@ -43,6 +45,14 @@ export default function TasksPage() {
 
   useEffect(() => { load() }, [page, filter])
 
+  useEffect(() => {
+    if (open) {
+      getEmployees()
+        .then((res) => setEmployees((res.data.items || []).map(e => ({ id: e.id, name: e.full_name }))))
+        .catch(() => setEmployees([]))
+    }
+  }, [open])
+
   const set = (k: keyof TaskPayload) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
 
@@ -51,7 +61,13 @@ export default function TasksPage() {
     setSaving(true)
     setErr('')
     try {
-      await tasksApi.create(form)
+      const payload: Partial<TaskPayload> = {}
+      Object.entries(form).forEach(([k, v]) => {
+        if (v !== '' && v !== null && v !== undefined) {
+          payload[k as keyof TaskPayload] = v as any
+        }
+      })
+      await tasksApi.create(payload as TaskPayload)
       setOpen(false)
       setForm({ title: '' })
       load()
@@ -131,7 +147,7 @@ export default function TasksPage() {
                   <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Status</th>
                   <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Assigned To</th>
                   <th className="hidden lg:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Due Date</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4"></th>
+                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -153,7 +169,6 @@ export default function TasksPage() {
                         <option value="pending">Pending</option>
                         <option value="in_progress">In Progress</option>
                         <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
                       </select>
                     </td>
                     <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{t.assigned_to_name || '-'}</td>
@@ -191,6 +206,20 @@ export default function TasksPage() {
         <div className="space-y-4">
           {err && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-sm text-red-400">{err}</div>}
           <Input id="t-title" label="Title" value={form.title} onChange={set('title')} required />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-300">Assigned To</label>
+            <select
+              id="t-assign"
+              value={form.assigned_to || ''}
+              onChange={set('assigned_to')}
+              className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">Unassigned</option>
+              {employees.map(e => (
+                <option key={e.id} value={e.id}>{e.name}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-slate-300">Description</label>
             <textarea

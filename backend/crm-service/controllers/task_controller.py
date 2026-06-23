@@ -1,6 +1,6 @@
 import math
 from fastapi import APIRouter, Depends
-from schemas.task_schemas import TaskReq, TaskListRes
+from schemas.task_schemas import TaskCreate, TaskReq, TaskListRes
 from schemas.customer_schemas import BaseRes
 from services.task_service import add_task
 from helpers.tenant_guard import get_tnt
@@ -33,7 +33,7 @@ async def list_tasks(page: int = 1, size: int = 10, tid: str = Depends(get_tnt))
     return {"items": items, "total": total, "page": page, "size": size, "pages": pages}
 
 @r.post("", response_model=BaseRes)
-async def mk_task(req: TaskReq, tid: str = Depends(get_tnt)):
+async def mk_task(req: TaskCreate, tid: str = Depends(get_tnt)):
     return await add_task(req, tid)
 
 from pydantic import BaseModel

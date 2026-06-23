@@ -31,9 +31,9 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/customers" element={<ProtectedRoute roles={['company_admin']}><CustomersPage /></ProtectedRoute>} />
-            <Route path="/customers/:id" element={<ProtectedRoute roles={['company_admin']}><CustomerDetailPage /></ProtectedRoute>} />
-            <Route path="/employees" element={<ProtectedRoute roles={['company_admin']}><EmployeesPage /></ProtectedRoute>} />
+            <Route path="/customers" element={<CustomersPage />} />
+            <Route path="/customers/:id" element={<CustomerDetailPage />} />
+            <Route path="/employees" element={<EmployeesPage />} />
             <Route path="/tasks" element={<ProtectedRoute roles={['company_admin', 'employee']}><TasksPage /></ProtectedRoute>} />
             <Route path="/tenants" element={<ProtectedRoute roles={['super_admin']}><TenantsPage /></ProtectedRoute>} />
             <Route path="/tenants/:id" element={<ProtectedRoute roles={['super_admin']}><TenantDetailPage /></ProtectedRoute>} />

@@ -4,7 +4,17 @@ from typing import List, Any, Optional
 class TaskReq(BaseModel):
     title: str
     status: str
-    assigned_to: str | None = None
+    assigned_to: Optional[str] = None
+    due_date: Optional[str] = None
+    description: Optional[str] = None
+
+from datetime import date
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+    due_date: date
+    assigned_to: Optional[str] = None
 
 class TaskItem(BaseModel):
     id: str
