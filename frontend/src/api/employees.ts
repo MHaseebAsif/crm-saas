@@ -2,10 +2,9 @@ import client from './client'
 import type { Employee, PaginatedResponse } from '../types'
 
 export interface EmployeePayload {
-  full_name: string
+  name: string
   email: string
-  department?: string
-  position?: string
+  role: string
 }
 
 export const employeesApi = {

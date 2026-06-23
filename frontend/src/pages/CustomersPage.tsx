@@ -20,7 +20,7 @@ export default function CustomersPage() {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [viewCustomer, setViewCustomer] = useState<Customer | null>(null)
-  const [form, setForm] = useState<CustomerPayload>({ name: '', email: '' })
+  const [form, setForm] = useState<CustomerPayload>({ name: '', email: '', status: 'lead', company: '', phone: '' })
   const [err, setErr] = useState('')
 
   const load = async (p = page, q = search) => {
@@ -53,7 +53,7 @@ export default function CustomersPage() {
     try {
       await customersApi.create(form)
       setOpen(false)
-      setForm({ name: '', email: '' })
+      setForm({ name: '', email: '', status: 'lead', company: '', phone: '' })
       load()
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail

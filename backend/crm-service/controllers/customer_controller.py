@@ -26,12 +26,12 @@ async def list_custs(
             "tenant_id": str(c.tenant_id),
             "name": c.name,
             "email": c.email,
-            "phone": None,
-            "company": None,
-            "status": "lead",
+            "phone": c.phone,
+            "company": c.company,
+            "status": c.status,
             "notes": None,
-            "created_at": "",
-            "updated_at": "",
+            "created_at": c.created_at.isoformat() if c.created_at else "",
+            "updated_at": c.updated_at.isoformat() if c.updated_at else "",
         }
         for c in rows
     ]
@@ -66,6 +66,7 @@ class CustPatchReq(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     status: Optional[str] = None
+    company: Optional[str] = None
 
 @r.patch("/{id}")
 async def patch_cust(id: str, req: CustPatchReq, tid: str = Depends(get_tnt)):
@@ -77,18 +78,24 @@ async def patch_cust(id: str, req: CustPatchReq, tid: str = Depends(get_tnt)):
         c.name = req.name
     if req.email is not None:
         c.email = req.email
+    if req.phone is not None:
+        c.phone = req.phone
+    if req.status is not None:
+        c.status = req.status
+    if req.company is not None:
+        c.company = req.company
     await c.save()
     return {
         "id": str(c.id),
         "tenant_id": str(c.tenant_id),
         "name": c.name,
         "email": c.email,
-        "phone": req.phone,
-        "company": None,
-        "status": req.status or "lead",
+        "phone": c.phone,
+        "company": c.company,
+        "status": c.status,
         "notes": None,
-        "created_at": "",
-        "updated_at": "",
+        "created_at": c.created_at.isoformat() if c.created_at else "",
+        "updated_at": c.updated_at.isoformat() if c.updated_at else "",
     }
 
 @r.delete("/{id}", response_model=BaseRes)

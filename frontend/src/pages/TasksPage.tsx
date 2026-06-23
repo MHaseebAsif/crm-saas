@@ -48,7 +48,7 @@ export default function TasksPage() {
   useEffect(() => {
     if (open) {
       getEmployees()
-        .then((res) => setEmployees((res.data.items || []).map(e => ({ id: e.id, name: e.full_name }))))
+        .then((res) => setEmployees((res.data.items || []).map(e => ({ id: e.id, name: e.name }))))
         .catch(() => setEmployees([]))
     }
   }, [open])

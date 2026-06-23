@@ -4,5 +4,5 @@ from models.employee_models import Employee
 import uuid
 
 async def add_emp(req: EmpReq, tid: str) -> BaseRes:
-    await Employee.create(id=uuid.uuid4(), tenant_id=tid, user_id=req.user_id, name=req.name)
+    await Employee.create(id=uuid.uuid4(), tenant_id=tid, name=req.name, email=req.email, role=req.role)
     return BaseRes(msg="ok")

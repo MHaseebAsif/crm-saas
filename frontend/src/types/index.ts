@@ -36,13 +36,9 @@ export interface Customer {
 export interface Employee {
   id: string
   tenant_id: string
-  user_id: string
-  full_name: string
+  name: string
   email: string
-  department: string | null
-  position: string | null
-  is_active: boolean
-  created_at: string
+  role: string
 }
 
 export type TaskStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled'

@@ -8,7 +8,7 @@ import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import Spinner from '../components/ui/Spinner'
 import EmptyState from '../components/ui/EmptyState'
-import { fmt, initials } from '../lib/utils'
+
 
 export default function EmployeesPage() {
   const [items, setItems] = useState<Employee[]>([])
@@ -18,7 +18,7 @@ export default function EmployeesPage() {
   const [loading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState<EmployeePayload>({ full_name: '', email: '' })
+  const [form, setForm] = useState<EmployeePayload>({ name: '', email: '', role: 'employee' })
   const [err, setErr] = useState('')
 
   const load = async (p = page, q = search) => {
@@ -35,17 +35,17 @@ export default function EmployeesPage() {
 
   useEffect(() => { load() }, [page])
 
-  const set = (k: keyof EmployeePayload) => (e: React.ChangeEvent<HTMLInputElement>) =>
+  const set = (k: keyof EmployeePayload) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const save = async () => {
-    if (!form.full_name || !form.email) { setErr('Name and email required'); return }
+    if (!form.name || !form.email) { setErr('Name and email required'); return }
     setSaving(true)
     setErr('')
     try {
       await employeesApi.create(form)
       setOpen(false)
-      setForm({ full_name: '', email: '' })
+      setForm({ name: '', email: '', role: 'employee' })
       load()
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
@@ -96,34 +96,36 @@ export default function EmployeesPage() {
           action={<Button onClick={() => setOpen(true)}>Add Employee</Button>}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {items.map((emp) => (
-            <div key={emp.id} className="bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-slate-600 transition-all">
-              <div className="flex items-start gap-4">
-                <div className="w-11 h-11 rounded-full bg-indigo-600/30 flex items-center justify-center text-sm font-bold text-indigo-300 shrink-0">
-                  {initials(emp.full_name)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-slate-100 truncate">{emp.full_name}</p>
-                  <p className="text-sm text-slate-400 truncate">{emp.email}</p>
-                  {emp.position && <p className="text-xs text-slate-500 mt-1">{emp.position}</p>}
-                  {emp.department && <p className="text-xs text-slate-500">{emp.department}</p>}
-                </div>
-                <Badge variant={emp.is_active ? 'success' : 'default'}>
-                  {emp.is_active ? 'Active' : 'Inactive'}
-                </Badge>
-              </div>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-xs text-slate-500">{fmt(emp.created_at)}</span>
-                <button
-                  onClick={() => del(emp.id)}
-                  className="text-xs text-red-400 hover:text-red-300 transition-colors"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-700">
+                <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Name</th>
+                <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Email</th>
+                <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Role</th>
+                <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800">
+              {items.map((emp) => (
+                <tr key={emp.id} className="hover:bg-slate-700/30 transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-slate-100">{emp.name}</td>
+                  <td className="px-6 py-4 text-sm text-slate-400">{emp.email}</td>
+                  <td className="px-6 py-4">
+                    <Badge variant={emp.role === 'company_admin' ? 'success' : 'default'}>{emp.role}</Badge>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button
+                      onClick={() => del(emp.id)}
+                      className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -148,10 +150,20 @@ export default function EmployeesPage() {
       >
         <div className="space-y-4">
           {err && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-sm text-red-400">{err}</div>}
-          <Input id="e-name" label="Full Name" value={form.full_name} onChange={set('full_name')} required />
+          <Input id="e-name" label="Name" value={form.name} onChange={set('name')} required />
           <Input id="e-email" label="Email" type="email" value={form.email} onChange={set('email')} required />
-          <Input id="e-dept" label="Department" value={form.department || ''} onChange={set('department')} />
-          <Input id="e-pos" label="Position" value={form.position || ''} onChange={set('position')} />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-300">Role</label>
+            <select
+              id="e-role"
+              value={form.role}
+              onChange={set('role')}
+              className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="employee">Employee</option>
+              <option value="company_admin">Company Admin</option>
+            </select>
+          </div>
         </div>
       </Modal>
     </div>

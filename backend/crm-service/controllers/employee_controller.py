@@ -25,13 +25,9 @@ async def list_emps(
         {
             "id": str(e.id),
             "tenant_id": str(e.tenant_id),
-            "user_id": str(e.user_id) if e.user_id else None,
             "name": e.name,
-            "email": "",
-            "department": None,
-            "position": None,
-            "is_active": True,
-            "created_at": "",
+            "email": e.email,
+            "role": e.role,
         }
         for e in rows
     ]
@@ -46,7 +42,6 @@ class EmpPatchReq(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     role: Optional[str] = None
-    department: Optional[str] = None
 
 @r.patch("/{eid}")
 async def patch_emp(eid: str, req: EmpPatchReq, tid: str = Depends(get_tnt)):
@@ -56,17 +51,17 @@ async def patch_emp(eid: str, req: EmpPatchReq, tid: str = Depends(get_tnt)):
         raise HTTPException(404, "Not found")
     if req.name is not None:
         e.name = req.name
+    if req.email is not None:
+        e.email = req.email
+    if req.role is not None:
+        e.role = req.role
     await e.save()
     return {
         "id": str(e.id),
         "tenant_id": str(e.tenant_id),
-        "user_id": str(e.user_id),
-        "full_name": e.name,
-        "email": req.email or "",
-        "department": req.department,
-        "position": None,
-        "is_active": True,
-        "created_at": "",
+        "name": e.name,
+        "email": e.email,
+        "role": e.role,
     }
 
 @r.delete("/{eid}", response_model=BaseRes)
