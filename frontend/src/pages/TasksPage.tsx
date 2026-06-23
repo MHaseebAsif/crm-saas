@@ -9,7 +9,7 @@ import Badge from '../components/ui/Badge'
 import Modal from '../components/ui/Modal'
 import Spinner from '../components/ui/Spinner'
 import EmptyState from '../components/ui/EmptyState'
-import { fmt } from '../lib/utils'
+
 
 
 
@@ -171,8 +171,8 @@ export default function TasksPage() {
                         <option value="completed">Completed</option>
                       </select>
                     </td>
-                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{t.assigned_to_name || '-'}</td>
-                    <td className="hidden lg:table-cell px-6 py-4 text-sm text-slate-400">{t.due_date ? fmt(t.due_date) : '-'}</td>
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{t.assigned_to || '-'}</td>
+                    <td className="hidden lg:table-cell px-6 py-4 text-sm text-slate-400">{t.due_date ? new Date(t.due_date).toLocaleDateString() : '-'}</td>
                     <td className="px-6 py-4">
                       <button onClick={() => del(t.id)} className="text-xs text-red-400 hover:text-red-300 transition-colors">Delete</button>
                     </td>
