@@ -127,7 +127,7 @@ export default function CustomersPage() {
             <table className="w-full" style={{ borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                  {['Name', 'Email', 'Company', 'Status', 'Created', ''].map((h) => (
+                  {['Name', 'Email', 'Company', 'Status', 'Created', 'Actions'].map((h) => (
                     <th key={h} className={h === 'Company' || h === 'Created' ? 'hidden md:table-cell' : ''} style={{ textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}>{h}</th>
                   ))}
                 </tr>
@@ -150,10 +150,31 @@ export default function CustomersPage() {
                     <td style={{ padding: '14px 24px' }}>
                       <button
                         onClick={() => setViewCustomer(c)}
-                        style={{ fontSize: 12, color: '#a5b4fc', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = '#c7d2fe' }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = '#a5b4fc' }}
+                        className="inline-flex items-center gap-1.5 transition-all"
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: '#a5b4fc',
+                          background: 'rgba(99,102,241,0.15)',
+                          border: '1px solid rgba(99,102,241,0.3)',
+                          borderRadius: 999,
+                          padding: '4px 10px',
+                          cursor: 'pointer',
+                          boxShadow: '0 0 10px rgba(99,102,241,0.1)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(99,102,241,0.25)'
+                          e.currentTarget.style.boxShadow = '0 0 14px rgba(99,102,241,0.2)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(99,102,241,0.15)'
+                          e.currentTarget.style.boxShadow = '0 0 10px rgba(99,102,241,0.1)'
+                        }}
                       >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
                         View
                       </button>
                     </td>
