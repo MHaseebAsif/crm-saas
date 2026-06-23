@@ -16,14 +16,6 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
-interface Stat {
-  label: string
-  value: string | number
-  link: string
-  color: string
-  glow: string
-}
-
 interface HealthMetrics {
   cpu: number | null
   memory: number | null
@@ -110,8 +102,6 @@ function CountUp({ end, duration = 1000 }: { end: number; duration?: number }) {
 
 export default function DashboardPage() {
   const { role, user, token } = useAuthStore()
-  const [stats, setStats] = useState<Stat[]>([])
-  const [loading, setLoading] = useState(true)
   const [health, setHealth] = useState<HealthMetrics>({ cpu: null, memory: null, servicesUp: null })
   const [cpuHistory, setCpuHistory] = useState<CpuDataPoint[]>([])
   
@@ -150,39 +140,6 @@ export default function DashboardPage() {
     }
     loadTopStats()
   }, [token])
-
-  useEffect(() => {
-    const load = async () => {
-      try {
-        if (role === 'super_admin') {
-          const [t] = await Promise.all([tenantsApi.list(1, 1)])
-          setStats([
-            { label: 'Total Tenants', value: t.data.total, link: '/tenants', color: '#a5b4fc', glow: 'rgba(99,102,241,0.4)' },
-          ])
-        } else if (role === 'company_admin') {
-          const [c, e, t] = await Promise.all([
-            customersApi.list(1, 1),
-            employeesApi.list(1, 1),
-            tasksApi.list(1, 1),
-          ])
-          setStats([
-            { label: 'Customers', value: c.data.total, link: '/customers', color: '#6ee7b7', glow: 'rgba(16,185,129,0.4)' },
-            { label: 'Employees', value: e.data.total, link: '/employees', color: '#a5b4fc', glow: 'rgba(99,102,241,0.4)' },
-            { label: 'Tasks', value: t.data.total, link: '/tasks', color: '#fcd34d', glow: 'rgba(245,158,11,0.4)' },
-          ])
-        } else {
-          const [t] = await Promise.all([tasksApi.list(1, 1)])
-          setStats([
-            { label: 'My Tasks', value: t.data.total, link: '/tasks', color: '#a5b4fc', glow: 'rgba(99,102,241,0.4)' },
-          ])
-        }
-      } catch (_) {
-      } finally {
-        setLoading(false)
-      }
-    }
-    load()
-  }, [role])
 
   const fetchHealth = useCallback(async () => {
     const [cpu, memory, servicesRaw, history] = await Promise.all([
@@ -283,29 +240,6 @@ export default function DashboardPage() {
           Welcome back, <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{user?.full_name}</span>
         </p>
       </div>
-
-      {loading ? (
-        <div className="flex justify-center py-16">
-          <Spinner size="lg" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((s) => (
-            <div key={s.label} style={{ transition: 'all 0.25s ease' }}>
-              <Link to={s.link}>
-                <Card style={{ boxShadow: `0 0 20px ${s.glow}` }} className="cursor-pointer">
-                  <CardBody className="py-6">
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{s.label}</p>
-                    <p style={{ fontSize: 40, fontWeight: 700, color: s.color, textShadow: `0 0 20px ${s.glow}`, lineHeight: 1 }}>
-                      {s.value}
-                    </p>
-                  </CardBody>
-                </Card>
-              </Link>
-            </div>
-          ))}
-        </div>
-      )}
 
       <div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
