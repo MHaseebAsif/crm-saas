@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { notificationsApi } from '../api/notifications'
-import { useAuthStore } from '../store/authStore'
 import type { Notification } from '../types'
 import { Card, CardHeader, CardBody, CardTitle } from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -9,9 +8,6 @@ import Badge from '../components/ui/Badge'
 import Spinner from '../components/ui/Spinner'
 import EmptyState from '../components/ui/EmptyState'
 import { fmtDateTime } from '../lib/utils'
-import { cn } from '../lib/utils'
-
-const WS_BASE = import.meta.env.VITE_NOTIFICATION_WS_URL || 'ws://localhost:8004'
 
 const gradientTitle: React.CSSProperties = {
   background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
@@ -28,8 +24,6 @@ export default function NotificationsPage() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [marking, setMarking] = useState(false)
-  const wsRef = useRef<WebSocket | null>(null)
-  const tenantId = useAuthStore((s) => s.tenantId)
 
   const load = async (p = page) => {
     setLoading(true)
@@ -46,75 +40,15 @@ export default function NotificationsPage() {
   useEffect(() => { load() }, [page])
 
   useEffect(() => {
-    if (!tenantId) return
-    let retryCount = 0
-    let timeout: ReturnType<typeof setTimeout>
-
-    const connect = () => {
+    const id = setInterval(async () => {
       try {
-        const ws = new WebSocket(`${WS_BASE}/notifications/ws/${tenantId}`)
-        wsRef.current = ws
-
-        ws.onopen = () => {
-          retryCount = 0
-        }
-
-        ws.onmessage = (evt) => {
-          try {
-            const raw = JSON.parse(evt.data) as {
-              id: string; type: string; title: string; message: string; is_read: boolean; created_at: string | null
-            }
-            const notif: Notification = {
-              id: raw.id,
-              user_id: tenantId,
-              title: raw.title || raw.type,
-              message: raw.message,
-              is_read: false,
-              created_at: raw.created_at ?? new Date().toISOString(),
-            }
-            setItems((prev) => [notif, ...prev])
-            setTotal((t) => t + 1)
-            toast.custom(
-              (t) => (
-                <div
-                  className={cn('flex gap-3 items-start max-w-sm', t.visible ? 'animate-enter' : 'animate-leave')}
-                  style={{
-                    background: 'rgba(10,8,30,0.85)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(99,102,241,0.4)',
-                    borderRadius: 14,
-                    padding: '12px 16px',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                  }}
-                >
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#6366f1', boxShadow: '0 0 8px #6366f1', marginTop: 4, flexShrink: 0 }} />
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.9)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{notif.title}</p>
-                    {notif.message && notif.message !== notif.title && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>{notif.message}</p>}
-                  </div>
-                </div>
-              ),
-              { duration: 4000 }
-            )
-          } catch (_) {}
-        }
-        ws.onerror = () => {}
-        ws.onclose = () => {
-          if (retryCount < 3) {
-            retryCount++
-            timeout = setTimeout(connect, 5000)
-          }
-        }
+        const { data } = await notificationsApi.list(page, 20)
+        setItems(data.items)
+        setTotal(data.total)
       } catch (_) {}
-    }
-
-    connect()
-
-    return () => {
-      clearTimeout(timeout)
-      if (wsRef.current) wsRef.current.close()
-    }
-  }, [tenantId])
+    }, 30000)
+    return () => clearInterval(id)
+  }, [page])
 
   const markRead = async (id: string) => {
     try {

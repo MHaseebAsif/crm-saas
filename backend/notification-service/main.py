@@ -19,6 +19,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi import WebSocket, WebSocketDisconnect
+
+connections: dict[str, list[WebSocket]] = {}
+
+@app.websocket("/notifications/ws/{tid}")
+async def ws_endpoint(websocket: WebSocket, tid: str):
+    await websocket.accept()
+    if tid not in connections:
+        connections[tid] = []
+    connections[tid].append(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        if websocket in connections[tid]:
+            connections[tid].remove(websocket)
+
 app.include_router(n_r, prefix="/notifications")
 app.include_router(h_r, prefix="/health")
 
