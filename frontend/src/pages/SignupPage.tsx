@@ -4,6 +4,15 @@ import { authApi } from '../api/auth'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 
+const gradientTitle: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  fontSize: 32,
+  fontWeight: 800,
+}
+
 export default function SignupPage() {
   const nav = useNavigate()
   const [form, setForm] = useState({
@@ -42,12 +51,21 @@ export default function SignupPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold text-slate-100">Create account</h2>
-        <p className="text-slate-400 mt-2">Start your free trial today</p>
+        <h2 style={gradientTitle}>Create account</h2>
+        <p style={{ color: 'rgba(255,255,255,0.45)', marginTop: 8, fontSize: 15 }}>Start your free trial today</p>
       </div>
 
       {err && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-400">
+        <div
+          style={{
+            background: 'rgba(244,63,94,0.1)',
+            border: '1px solid rgba(244,63,94,0.3)',
+            borderRadius: 12,
+            padding: '12px 16px',
+            fontSize: 14,
+            color: '#fca5a5',
+          }}
+        >
           {err}
         </div>
       )}
@@ -94,9 +112,14 @@ export default function SignupPage() {
         </Button>
       </form>
 
-      <p className="text-center text-slate-400 text-sm">
+      <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
         Already have an account?{' '}
-        <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+        <Link
+          to="/login"
+          style={{ color: '#a5b4fc', fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s ease' }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = '#c7d2fe' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = '#a5b4fc' }}
+        >
           Sign in
         </Link>
       </p>

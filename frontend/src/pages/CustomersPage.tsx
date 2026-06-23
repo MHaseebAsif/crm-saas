@@ -12,6 +12,28 @@ import EmptyState from '../components/ui/EmptyState'
 
 const statusVariant = { active: 'success', inactive: 'default', lead: 'warning' } as const
 
+const gradientTitle: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  fontSize: 26,
+  fontWeight: 800,
+}
+
+const glassSelect: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 12px',
+  borderRadius: 12,
+  background: 'rgba(255,255,255,0.06)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  color: 'rgba(255,255,255,0.9)',
+  fontSize: 13,
+  outline: 'none',
+}
+
 export default function CustomersPage() {
   const [items, setItems] = useState<Customer[]>([])
   const [total, setTotal] = useState(0)
@@ -63,12 +85,19 @@ export default function CustomersPage() {
     }
   }
 
+  const rowHover = (e: React.MouseEvent<HTMLTableRowElement>, enter: boolean) => {
+    const el = e.currentTarget
+    el.style.background = enter ? 'rgba(255,255,255,0.04)' : 'transparent'
+    el.style.transform = enter ? 'translateY(-1px)' : 'translateY(0)'
+    el.style.boxShadow = enter ? '0 4px 12px rgba(0,0,0,0.2)' : 'none'
+  }
+
   return (
     <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Customers</h1>
-          <p className="text-slate-400 mt-1">{total} total</p>
+          <h1 style={gradientTitle}>Customers</h1>
+          <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: 4, fontSize: 13 }}>{total} total</p>
         </div>
         <Button onClick={() => setOpen(true)} className="w-full sm:w-auto">Add Customer</Button>
       </div>
@@ -95,29 +124,38 @@ export default function CustomersPage() {
           />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full" style={{ borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Name</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Email</th>
-                  <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Company</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Status</th>
-                  <th className="hidden md:table-cell text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4">Created</th>
-                  <th className="text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-6 py-4"></th>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                  {['Name', 'Email', 'Company', 'Status', 'Created', ''].map((h) => (
+                    <th key={h} className={h === 'Company' || h === 'Created' ? 'hidden md:table-cell' : ''} style={{ textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody>
                 {items.map((c) => (
-                  <tr key={c.id} className="hover:bg-slate-700/30 transition-colors">
-                    <td className="px-6 py-4 text-sm font-medium text-slate-100">{c.name}</td>
-                    <td className="px-6 py-4 text-sm text-slate-400">{c.email}</td>
-                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{c.company || '-'}</td>
-                    <td className="px-6 py-4">
+                  <tr
+                    key={c.id}
+                    style={{ transition: 'all 0.2s ease', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                    onMouseEnter={(e) => rowHover(e, true)}
+                    onMouseLeave={(e) => rowHover(e, false)}
+                  >
+                    <td style={{ padding: '14px 24px', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{c.name}</td>
+                    <td style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>{c.email}</td>
+                    <td className="hidden md:table-cell" style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>{c.company || '-'}</td>
+                    <td style={{ padding: '14px 24px' }}>
                       <Badge variant={statusVariant[c.status]}>{c.status}</Badge>
                     </td>
-                    <td className="hidden md:table-cell px-6 py-4 text-sm text-slate-400">{c?.created_at ? new Date(c.created_at).toLocaleDateString() : '-'}</td>
-                    <td className="px-6 py-4">
-                      <button onClick={() => setViewCustomer(c)} className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors">View</button>
+                    <td className="hidden md:table-cell" style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>{c?.created_at ? new Date(c.created_at).toLocaleDateString() : '-'}</td>
+                    <td style={{ padding: '14px 24px' }}>
+                      <button
+                        onClick={() => setViewCustomer(c)}
+                        style={{ fontSize: 12, color: '#a5b4fc', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = '#c7d2fe' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#a5b4fc' }}
+                      >
+                        View
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -130,7 +168,7 @@ export default function CustomersPage() {
       {total > 20 && (
         <div className="flex justify-center gap-3">
           <Button variant="secondary" size="sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>Prev</Button>
-          <span className="text-slate-400 text-sm py-1.5">Page {page}</span>
+          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, padding: '6px 0' }}>Page {page}</span>
           <Button variant="secondary" size="sm" disabled={page * 20 >= total} onClick={() => setPage((p) => p + 1)}>Next</Button>
         </div>
       )}
@@ -152,13 +190,8 @@ export default function CustomersPage() {
           <Input id="c-phone" label="Phone" value={form.phone || ''} onChange={set('phone')} />
           <Input id="c-company" label="Company" value={form.company || ''} onChange={set('company')} />
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-slate-300">Status</label>
-            <select
-              id="c-status"
-              value={form.status || 'lead'}
-              onChange={set('status')}
-              className="w-full px-3 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
+            <label style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>Status</label>
+            <select id="c-status" value={form.status || 'lead'} onChange={set('status')} style={glassSelect}>
               <option value="lead">Lead</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -175,20 +208,18 @@ export default function CustomersPage() {
       >
         {viewCustomer && (
           <div className="space-y-4">
+            {[
+              { label: 'Name', value: viewCustomer.name },
+              { label: 'Email', value: viewCustomer.email },
+              { label: 'Company', value: viewCustomer.company || '-' },
+            ].map((row) => (
+              <div key={row.label}>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>{row.label}</p>
+                <p style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 500 }}>{row.value}</p>
+              </div>
+            ))}
             <div>
-              <p className="text-sm text-slate-400">Name</p>
-              <p className="text-slate-100 font-medium">{viewCustomer.name}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Email</p>
-              <p className="text-slate-100">{viewCustomer.email}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Company</p>
-              <p className="text-slate-100">{viewCustomer.company || '-'}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-400">Status</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>Status</p>
               <Badge variant={statusVariant[viewCustomer.status]}>{viewCustomer.status}</Badge>
             </div>
           </div>

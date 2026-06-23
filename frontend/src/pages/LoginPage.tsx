@@ -5,6 +5,15 @@ import { useAuthStore } from '../store/authStore'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 
+const gradientTitle: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  fontSize: 32,
+  fontWeight: 800,
+}
+
 export default function LoginPage() {
   const nav = useNavigate()
   const { setTokens, setUser } = useAuthStore()
@@ -34,12 +43,21 @@ export default function LoginPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold text-slate-100">Welcome back</h2>
-        <p className="text-slate-400 mt-2">Sign in to your account</p>
+        <h2 style={gradientTitle}>Welcome back</h2>
+        <p style={{ color: 'rgba(255,255,255,0.45)', marginTop: 8, fontSize: 15 }}>Sign in to your account</p>
       </div>
 
       {err && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-400">
+        <div
+          style={{
+            background: 'rgba(244,63,94,0.1)',
+            border: '1px solid rgba(244,63,94,0.3)',
+            borderRadius: 12,
+            padding: '12px 16px',
+            fontSize: 14,
+            color: '#fca5a5',
+          }}
+        >
           {err}
         </div>
       )}
@@ -64,7 +82,12 @@ export default function LoginPage() {
           required
         />
         <div className="flex justify-end">
-          <Link to="/forgot-password" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
+          <Link
+            to="/forgot-password"
+            style={{ fontSize: 13, color: '#a5b4fc', textDecoration: 'none', transition: 'color 0.2s ease' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#c7d2fe' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#a5b4fc' }}
+          >
             Forgot password?
           </Link>
         </div>
@@ -73,9 +96,14 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="text-center text-slate-400 text-sm">
+      <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>
         No account?{' '}
-        <Link to="/signup" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+        <Link
+          to="/signup"
+          style={{ color: '#a5b4fc', fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s ease' }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = '#c7d2fe' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = '#a5b4fc' }}
+        >
           Create one
         </Link>
       </p>

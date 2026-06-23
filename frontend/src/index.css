@@ -1,7 +1,45 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --glass-bg: rgba(255,255,255,0.05);
+  --glass-border: rgba(255,255,255,0.1);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  --glass-blur: blur(20px);
+  --font-base: 'Inter', system-ui, sans-serif;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
 
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: var(--font-base);
+}
+
+body {
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e, #0f0c29, #1a1a3e);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  color: rgba(255,255,255,0.85);
+}
+
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+*::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 999px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+select option {
+  background: #1e1b3a;
+  color: #e2e8f0;
 }

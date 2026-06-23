@@ -95,6 +95,20 @@ const navItems: NavItem[] = [
   },
 ]
 
+const sidebarStyle: React.CSSProperties = {
+  background: 'rgba(10,8,30,0.7)',
+  backdropFilter: 'blur(24px)',
+  WebkitBackdropFilter: 'blur(24px)',
+  borderRight: '1px solid rgba(255,255,255,0.07)',
+}
+
+const topbarStyle: React.CSSProperties = {
+  background: 'rgba(10,8,30,0.6)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  borderBottom: '1px solid rgba(255,255,255,0.07)',
+}
+
 export default function AppLayout() {
   const { user, role, logout } = useAuthStore()
   const nav = useNavigate()
@@ -115,33 +129,48 @@ export default function AppLayout() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-900">
+    <div className="flex h-screen w-screen overflow-hidden">
       {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-slate-900/80 backdrop-blur-sm md:hidden"
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex flex-col bg-slate-950 border-r border-slate-800 transition-transform duration-300 md:relative md:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 flex flex-col transition-transform duration-300 md:relative md:translate-x-0',
           mobileMenuOpen ? 'translate-x-0 w-64' : '-translate-x-full',
           !mobileMenuOpen && collapsed ? 'md:w-16' : 'md:w-64'
         )}
+        style={sidebarStyle}
       >
-        <div className="flex items-center justify-between px-4 py-5 border-b border-slate-800">
+        <div
+          className="flex items-center justify-between px-4 py-5"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+        >
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+              style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 16px rgba(99,102,241,0.5)' }}
+            >
               <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            {(!collapsed || mobileMenuOpen) && <span className="font-bold text-slate-100 text-lg truncate">CRM SaaS</span>}
+            {(!collapsed || mobileMenuOpen) && (
+              <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.9)', fontSize: 17, letterSpacing: '-0.01em' }}>
+                CRM SaaS
+              </span>
+            )}
           </div>
           <button
             onClick={() => setCollapsed((c) => !c)}
-            className="hidden md:flex text-slate-400 hover:text-slate-100 transition-colors shrink-0 ml-2"
+            className="hidden md:flex shrink-0 ml-2 transition-colors"
+            style={{ color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.9)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.35)' }}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={collapsed ? 'M13 5l7 7-7 7M5 5l7 7-7 7' : 'M11 19l-7-7 7-7m8 14l-7-7 7-7'} />
@@ -149,32 +178,54 @@ export default function AppLayout() {
           </button>
         </div>
 
-        <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
+        <nav className="flex-1 py-4 px-2 space-y-0.5 overflow-y-auto">
           {visible.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 group',
-                  isActive
-                    ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800',
-                )
+                cn('flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group', isActive ? '' : '')
               }
+              style={({ isActive }) => isActive ? {
+                background: 'rgba(99,102,241,0.18)',
+                border: '1px solid rgba(99,102,241,0.35)',
+                color: '#a5b4fc',
+                boxShadow: '0 0 16px rgba(99,102,241,0.2)',
+                borderLeft: '3px solid #6366f1',
+              } : {
+                color: 'rgba(255,255,255,0.45)',
+                border: '1px solid transparent',
+              }}
               title={collapsed ? item.label : undefined}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget
+                if (!el.classList.contains('active')) {
+                  el.style.background = 'rgba(255,255,255,0.06)'
+                  el.style.color = 'rgba(255,255,255,0.9)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget
+                if (!el.classList.contains('active')) {
+                  el.style.background = 'transparent'
+                  el.style.color = 'rgba(255,255,255,0.45)'
+                }
+              }}
             >
               <span className="shrink-0">{item.icon}</span>
-              {(!collapsed || mobileMenuOpen) && <span className="text-sm font-medium">{item.label}</span>}
+              {(!collapsed || mobileMenuOpen) && <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>}
             </NavLink>
           ))}
         </nav>
 
-        <div className="p-2 border-t border-slate-800">
+        <div className="p-2" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all text-sm"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all text-sm"
+            style={{ color: '#fca5a5', background: 'transparent', border: 'none', cursor: 'pointer' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(244,63,94,0.1)'; e.currentTarget.style.color = '#fda4af' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#fca5a5' }}
           >
             <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -185,42 +236,64 @@ export default function AppLayout() {
       </aside>
 
       <main className="flex-1 overflow-y-auto flex flex-col relative">
-        <header className="flex items-center justify-between px-6 py-3 bg-slate-900 border-b border-slate-800 shrink-0 sticky top-0 z-30">
+        <header
+          className="flex items-center justify-between px-6 py-3 shrink-0 sticky top-0 z-30"
+          style={topbarStyle}
+        >
           <div className="flex items-center gap-4">
-            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden text-slate-400 hover:text-slate-100">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden"
+              style={{ color: 'rgba(255,255,255,0.6)', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div className="text-slate-100 font-semibold"></div>
+            <div style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}></div>
           </div>
           <div className="relative">
             <button
               onClick={() => setProfileMenuOpen((o) => !o)}
-              className="flex items-center gap-2 text-left hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 text-left transition-opacity hover:opacity-80"
             >
-              <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-sm text-white font-bold">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm text-white font-bold"
+                style={{ background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', boxShadow: '0 0 12px rgba(99,102,241,0.4)' }}
+              >
                 {user ? initials(user.full_name) : 'U'}
               </div>
-              <span className="text-sm font-medium text-slate-300">{user?.full_name}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{user?.full_name}</span>
             </button>
             {profileMenuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setProfileMenuOpen(false)} />
-                <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-lg shadow-xl border border-slate-700 py-1 z-50">
+                <div
+                  className="absolute right-0 mt-2 w-48 rounded-xl py-1 z-50"
+                  style={{
+                    background: 'rgba(10,8,30,0.85)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
+                  }}
+                >
                   <NavLink
                     to="/profile"
                     onClick={() => setProfileMenuOpen(false)}
-                    className="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-slate-100"
+                    className="block px-4 py-2 text-sm transition-colors"
+                    style={{ color: 'rgba(255,255,255,0.7)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#fff' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)' }}
                   >
                     Profile
                   </NavLink>
                   <button
-                    onClick={() => {
-                      setProfileMenuOpen(false)
-                      handleLogout()
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-slate-700 hover:text-red-300"
+                    onClick={() => { setProfileMenuOpen(false); handleLogout() }}
+                    className="w-full text-left px-4 py-2 text-sm transition-colors"
+                    style={{ color: '#fca5a5', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(244,63,94,0.1)' }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
                   >
                     Logout
                   </button>

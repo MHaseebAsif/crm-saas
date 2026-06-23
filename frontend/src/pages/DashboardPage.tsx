@@ -21,6 +21,7 @@ interface Stat {
   value: string | number
   link: string
   color: string
+  glow: string
 }
 
 interface HealthMetrics {
@@ -38,9 +39,7 @@ const PROMETHEUS = 'http://localhost:9090/api/v1'
 
 async function fetchScalar(query: string): Promise<number | null> {
   try {
-    const res = await fetch(
-      `${PROMETHEUS}/query?query=${encodeURIComponent(query)}`
-    )
+    const res = await fetch(`${PROMETHEUS}/query?query=${encodeURIComponent(query)}`)
     const json = await res.json()
     const raw = json?.data?.result?.[0]?.value?.[1]
     const val = parseFloat(raw)
@@ -54,8 +53,7 @@ async function fetchCpuHistory(): Promise<CpuDataPoint[]> {
   try {
     const now = Math.floor(Date.now() / 1000)
     const start = now - 3600
-    const query =
-      '100-(avg(rate(node_cpu_seconds_total{mode="idle"}[5m]))*100)'
+    const query = '100-(avg(rate(node_cpu_seconds_total{mode="idle"}[5m]))*100)'
     const url =
       `${PROMETHEUS}/query_range` +
       `?query=${encodeURIComponent(query)}` +
@@ -79,15 +77,30 @@ function fmt(val: number | null, decimals = 1): string {
   return val.toFixed(decimals)
 }
 
+const gradientTitle: React.CSSProperties = {
+  background: 'linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  fontSize: 26,
+  fontWeight: 800,
+  lineHeight: 1.2,
+}
+
+const glassSelect: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  color: 'rgba(255,255,255,0.8)',
+  borderRadius: 10,
+  padding: '4px 8px',
+  fontSize: 12,
+}
+
 export default function DashboardPage() {
   const { role, user } = useAuthStore()
   const [stats, setStats] = useState<Stat[]>([])
   const [loading, setLoading] = useState(true)
-  const [health, setHealth] = useState<HealthMetrics>({
-    cpu: null,
-    memory: null,
-    servicesUp: null,
-  })
+  const [health, setHealth] = useState<HealthMetrics>({ cpu: null, memory: null, servicesUp: null })
   const [cpuHistory, setCpuHistory] = useState<CpuDataPoint[]>([])
 
   useEffect(() => {
@@ -96,7 +109,7 @@ export default function DashboardPage() {
         if (role === 'super_admin') {
           const [t] = await Promise.all([tenantsApi.list(1, 1)])
           setStats([
-            { label: 'Total Tenants', value: t.data.total, link: '/tenants', color: 'text-indigo-400' },
+            { label: 'Total Tenants', value: t.data.total, link: '/tenants', color: '#a5b4fc', glow: 'rgba(99,102,241,0.4)' },
           ])
         } else if (role === 'company_admin') {
           const [c, e, t] = await Promise.all([
@@ -105,14 +118,14 @@ export default function DashboardPage() {
             tasksApi.list(1, 1),
           ])
           setStats([
-            { label: 'Customers', value: c.data.total, link: '/customers', color: 'text-emerald-400' },
-            { label: 'Employees', value: e.data.total, link: '/employees', color: 'text-indigo-400' },
-            { label: 'Tasks', value: t.data.total, link: '/tasks', color: 'text-amber-400' },
+            { label: 'Customers', value: c.data.total, link: '/customers', color: '#6ee7b7', glow: 'rgba(16,185,129,0.4)' },
+            { label: 'Employees', value: e.data.total, link: '/employees', color: '#a5b4fc', glow: 'rgba(99,102,241,0.4)' },
+            { label: 'Tasks', value: t.data.total, link: '/tasks', color: '#fcd34d', glow: 'rgba(245,158,11,0.4)' },
           ])
         } else {
           const [t] = await Promise.all([tasksApi.list(1, 1)])
           setStats([
-            { label: 'My Tasks', value: t.data.total, link: '/tasks', color: 'text-indigo-400' },
+            { label: 'My Tasks', value: t.data.total, link: '/tasks', color: '#a5b4fc', glow: 'rgba(99,102,241,0.4)' },
           ])
         }
       } catch (_) {
@@ -150,40 +163,35 @@ export default function DashboardPage() {
     {
       label: 'CPU Usage',
       value: health.cpu !== null ? `${fmt(health.cpu)}%` : '—',
-      color:
-        health.cpu === null
-          ? 'text-slate-400'
-          : health.cpu > 80
-          ? 'text-red-400'
-          : health.cpu > 60
-          ? 'text-amber-400'
-          : 'text-emerald-400',
+      color: health.cpu === null ? 'rgba(255,255,255,0.3)' : health.cpu > 80 ? '#fca5a5' : health.cpu > 60 ? '#fcd34d' : '#6ee7b7',
+      glow: health.cpu !== null && health.cpu > 80 ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)',
     },
     {
       label: 'Memory Usage',
       value: health.memory !== null ? `${fmt(health.memory)}%` : '—',
-      color:
-        health.memory === null
-          ? 'text-slate-400'
-          : health.memory > 80
-          ? 'text-red-400'
-          : health.memory > 60
-          ? 'text-amber-400'
-          : 'text-emerald-400',
+      color: health.memory === null ? 'rgba(255,255,255,0.3)' : health.memory > 80 ? '#fca5a5' : health.memory > 60 ? '#fcd34d' : '#6ee7b7',
+      glow: health.memory !== null && health.memory > 80 ? 'rgba(244,63,94,0.3)' : 'rgba(16,185,129,0.3)',
     },
     {
       label: 'Services Up',
       value: health.servicesUp !== null ? health.servicesUp : '—',
-      color: health.servicesUp === null ? 'text-slate-400' : 'text-emerald-400',
+      color: health.servicesUp === null ? 'rgba(255,255,255,0.3)' : '#6ee7b7',
+      glow: 'rgba(16,185,129,0.3)',
     },
   ]
+
+  const tableRowHover = (e: React.MouseEvent<HTMLTableRowElement>, enter: boolean) => {
+    const el = e.currentTarget
+    el.style.background = enter ? 'rgba(255,255,255,0.04)' : 'transparent'
+    el.style.transform = enter ? 'translateY(-1px)' : 'translateY(0)'
+  }
 
   return (
     <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Dashboard</h1>
-        <p className="text-slate-400 mt-1">
-          Welcome back, <span className="text-slate-200 font-medium">{user?.full_name}</span>
+        <h1 style={gradientTitle}>Dashboard</h1>
+        <p style={{ color: 'rgba(255,255,255,0.4)', marginTop: 4, fontSize: 14 }}>
+          Welcome back, <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{user?.full_name}</span>
         </p>
       </div>
 
@@ -195,10 +203,15 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((s) => (
             <Link key={s.label} to={s.link}>
-              <Card className="hover:border-slate-600 transition-all duration-200 cursor-pointer group">
+              <Card
+                className="cursor-pointer"
+                style={{
+                  transition: 'all 0.25s ease',
+                }}
+              >
                 <CardBody className="py-6">
-                  <p className="text-sm text-slate-400 mb-2">{s.label}</p>
-                  <p className={`text-4xl font-bold ${s.color} group-hover:scale-105 transition-transform origin-left`}>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{s.label}</p>
+                  <p style={{ fontSize: 40, fontWeight: 700, color: s.color, textShadow: `0 0 20px ${s.glow}`, lineHeight: 1 }}>
                     {s.value}
                   </p>
                 </CardBody>
@@ -209,13 +222,13 @@ export default function DashboardPage() {
       )}
 
       <div>
-        <h2 className="text-lg font-semibold text-slate-200 mb-4">System Health</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>System Health</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
           {healthCards.map((hc) => (
             <Card key={hc.label}>
               <CardBody className="py-6">
-                <p className="text-sm text-slate-400 mb-2">{hc.label}</p>
-                <p className={`text-4xl font-bold ${hc.color}`}>{hc.value}</p>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{hc.label}</p>
+                <p style={{ fontSize: 40, fontWeight: 700, color: hc.color, textShadow: `0 0 20px ${hc.glow}`, lineHeight: 1 }}>{hc.value}</p>
               </CardBody>
             </Card>
           ))}
@@ -223,9 +236,9 @@ export default function DashboardPage() {
 
         <Card>
           <CardBody>
-            <p className="text-sm font-medium text-slate-300 mb-4">CPU Usage (last 1h)</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)', marginBottom: 16 }}>CPU Usage (last 1h)</p>
             {cpuHistory.length === 0 ? (
-              <div className="flex items-center justify-center h-48 text-slate-500 text-sm">
+              <div className="flex items-center justify-center h-48" style={{ color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>
                 No data from Prometheus
               </div>
             ) : (
@@ -233,24 +246,25 @@ export default function DashboardPage() {
                 <LineChart data={cpuHistory} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
                   <XAxis
                     dataKey="time"
-                    tick={{ fill: '#94a3b8', fontSize: 11 }}
+                    tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }}
                     tickLine={false}
-                    axisLine={{ stroke: '#334155' }}
+                    axisLine={false}
                     interval="preserveStartEnd"
                   />
                   <YAxis
                     unit="%"
                     domain={[0, 100]}
-                    tick={{ fill: '#94a3b8', fontSize: 11 }}
+                    tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11 }}
                     tickLine={false}
                     axisLine={false}
                     width={40}
                   />
                   <Tooltip
                     contentStyle={{
-                      background: '#1e293b',
-                      border: '1px solid #334155',
-                      borderRadius: 8,
+                      background: 'rgba(10,8,30,0.85)',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: 10,
                       color: '#e2e8f0',
                       fontSize: 12,
                     }}
@@ -260,9 +274,10 @@ export default function DashboardPage() {
                     type="monotone"
                     dataKey="cpu"
                     stroke="#818cf8"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 4, fill: '#818cf8' }}
+                    activeDot={{ r: 4, fill: '#818cf8', stroke: '#c7d2fe', strokeWidth: 2 }}
+                    style={{ filter: 'drop-shadow(0 0 6px #818cf8)' }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -274,17 +289,31 @@ export default function DashboardPage() {
       <Card>
         <CardBody>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-600/20 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)' }}
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#a5b4fc' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
             <div>
-              <p className="font-semibold text-slate-100">{user?.full_name}</p>
-              <p className="text-sm text-slate-400">{user?.email}</p>
+              <p style={{ fontWeight: 600, color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>{user?.full_name}</p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{user?.email}</p>
             </div>
             <div className="ml-auto">
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 capitalize">
+              <span
+                style={{
+                  padding: '4px 12px',
+                  borderRadius: 999,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  background: 'rgba(99,102,241,0.15)',
+                  color: '#a5b4fc',
+                  border: '1px solid rgba(99,102,241,0.35)',
+                  textTransform: 'capitalize',
+                }}
+              >
                 {role?.replace('_', ' ')}
               </span>
             </div>
