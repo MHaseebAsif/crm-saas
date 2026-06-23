@@ -140,7 +140,7 @@ export default function EmployeesPage() {
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                   {['Name', 'Email', 'Role', 'Actions'].map((h) => (
-                    <th key={h} style={{ textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}>{h}</th>
+                    <th key={h} style={{ textAlign: h === 'Actions' ? 'right' : 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -160,11 +160,30 @@ export default function EmployeesPage() {
                     <td style={{ padding: '14px 24px', textAlign: 'right' }}>
                       <button
                         onClick={() => del(emp.id)}
-                        style={{ fontSize: 12, color: '#fca5a5', background: 'none', border: 'none', cursor: 'pointer' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = '#fda4af' }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = '#fca5a5' }}
+                        className="inline-flex items-center justify-center transition-all"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          color: '#fca5a5',
+                          background: 'rgba(244,63,94,0.15)',
+                          border: '1px solid rgba(244,63,94,0.3)',
+                          borderRadius: 999,
+                          cursor: 'pointer',
+                          boxShadow: '0 0 10px rgba(244,63,94,0.1)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(244,63,94,0.25)'
+                          e.currentTarget.style.boxShadow = '0 0 14px rgba(244,63,94,0.2)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(244,63,94,0.15)'
+                          e.currentTarget.style.boxShadow = '0 0 10px rgba(244,63,94,0.1)'
+                        }}
+                        title="Delete"
                       >
-                        Remove
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </td>
                   </tr>
