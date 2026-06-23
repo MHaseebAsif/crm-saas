@@ -1,12 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { customersApi } from '../api/customers'
-import { employeesApi } from '../api/employees'
-import { tasksApi } from '../api/tasks'
-import { tenantsApi } from '../api/tenants'
 import { Card, CardBody } from '../components/ui/Card'
-import Spinner from '../components/ui/Spinner'
 import {
   LineChart,
   Line,
