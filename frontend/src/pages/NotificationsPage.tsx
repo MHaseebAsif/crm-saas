@@ -5,6 +5,7 @@ import { useAuthStore } from '../store/authStore'
 import type { Notification } from '../types'
 import { Card, CardHeader, CardBody, CardTitle } from '../components/ui/Card'
 import Button from '../components/ui/Button'
+import Badge from '../components/ui/Badge'
 import Spinner from '../components/ui/Spinner'
 import EmptyState from '../components/ui/EmptyState'
 import { fmtDateTime } from '../lib/utils'
@@ -145,78 +146,91 @@ export default function NotificationsPage() {
           ) : items.length === 0 ? (
             <EmptyState title="No notifications" description="You are all caught up" />
           ) : (
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-              {items.map((n) => (
-                <li
-                  key={n.id}
-                  style={{
-                    display: 'flex',
-                    gap: 16,
-                    padding: '16px 24px',
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                    background: !n.is_read ? 'rgba(99,102,241,0.05)' : 'transparent',
-                    transition: 'background 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = !n.is_read ? 'rgba(99,102,241,0.05)' : 'transparent' }}
-                >
-                  <div
-                    style={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: '50%',
-                      flexShrink: 0,
-                      marginTop: 5,
-                      background: n.is_read ? 'rgba(255,255,255,0.15)' : '#6366f1',
-                      boxShadow: n.is_read ? 'none' : '0 0 8px rgba(99,102,241,0.7)',
-                    }}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: n.is_read ? 400 : 600, color: n.is_read ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.9)' }}>{n.title}</p>
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{n.message}</p>
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 4 }}>{fmtDateTime(n.created_at)}</p>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexShrink: 0 }}>
-                    {!n.is_read && (
-                      <button
-                        onClick={() => markRead(n.id)}
-                        style={{
-                          fontSize: 11,
-                          padding: '4px 10px',
-                          borderRadius: 999,
-                          border: '1px solid rgba(99,102,241,0.5)',
-                          color: '#a5b4fc',
-                          background: 'transparent',
-                          cursor: 'pointer',
-                          marginTop: 2,
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)' }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-                      >
-                        Mark read
-                      </button>
-                    )}
-                    <button
-                      onClick={() => del(n.id)}
-                      style={{
-                        fontSize: 11,
-                        padding: '4px 10px',
-                        borderRadius: 999,
-                        border: '1px solid rgba(244,63,94,0.4)',
-                        color: '#fca5a5',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                        marginTop: 2,
+            <div className="overflow-x-auto">
+              <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                    {['Message', 'Date', 'Status', 'Actions'].map((h) => (
+                      <th key={h} style={{ textAlign: h === 'Actions' ? 'right' : 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((n) => (
+                    <tr
+                      key={n.id}
+                      style={{ transition: 'all 0.2s ease', borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.04)'
+                        e.currentTarget.style.transform = 'translateY(-1px)'
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)'
                       }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(244,63,94,0.1)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent'
+                        e.currentTarget.style.transform = 'translateY(0)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
                     >
-                      Delete
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                      <td style={{ padding: '14px 24px', textAlign: 'left' }}>
+                        <p style={{ fontSize: 13, fontWeight: n.is_read ? 500 : 600, color: n.is_read ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.9)' }}>{n.title}</p>
+                        {n.message && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{n.message}</p>}
+                      </td>
+                      <td style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'left' }}>
+                        {fmtDateTime(n.created_at)}
+                      </td>
+                      <td style={{ padding: '14px 24px', textAlign: 'left' }}>
+                        <Badge variant={n.is_read ? 'success' : 'warning'}>{n.is_read ? 'Read' : 'Unread'}</Badge>
+                      </td>
+                      <td style={{ padding: '14px 24px', textAlign: 'right' }}>
+                        <div className="flex items-center justify-end gap-2">
+                          {!n.is_read && (
+                            <button
+                              onClick={() => markRead(n.id)}
+                              className="inline-flex items-center justify-center transition-all"
+                              style={{
+                                padding: '4px 12px',
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: '#a5b4fc',
+                                background: 'rgba(99,102,241,0.15)',
+                                border: '1px solid rgba(99,102,241,0.3)',
+                                borderRadius: 999,
+                                cursor: 'pointer',
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.25)' }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.15)' }}
+                            >
+                              Mark Read
+                            </button>
+                          )}
+                          <button
+                            onClick={() => del(n.id)}
+                            className="inline-flex items-center justify-center transition-all"
+                            style={{
+                              width: 32,
+                              height: 32,
+                              color: '#fca5a5',
+                              background: 'rgba(244,63,94,0.15)',
+                              border: '1px solid rgba(244,63,94,0.3)',
+                              borderRadius: 999,
+                              cursor: 'pointer',
+                              boxShadow: '0 0 10px rgba(244,63,94,0.1)',
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(244,63,94,0.25)' }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(244,63,94,0.15)' }}
+                            title="Delete"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </CardBody>
       </Card>
