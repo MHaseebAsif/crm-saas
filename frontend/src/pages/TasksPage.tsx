@@ -194,7 +194,7 @@ export default function TasksPage() {
                     <th
                       key={h}
                       className={i === 1 || i === 3 ? 'hidden md:table-cell' : i === 4 ? 'hidden lg:table-cell' : ''}
-                      style={{ textAlign: 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}
+                      style={{ textAlign: h === 'Actions' ? 'right' : 'left', fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', padding: '12px 24px' }}
                     >
                       {h}
                     </th>
@@ -209,14 +209,14 @@ export default function TasksPage() {
                     onMouseEnter={(e) => rowHover(e, true)}
                     onMouseLeave={(e) => rowHover(e, false)}
                   >
-                    <td style={{ padding: '14px 24px' }}>
+                    <td style={{ padding: '14px 24px', textAlign: 'left' }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{t.title}</p>
                       {t.description && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 240 }}>{t.description}</p>}
                     </td>
-                    <td className="hidden md:table-cell" style={{ padding: '14px 24px' }}>
+                    <td className="hidden md:table-cell" style={{ padding: '14px 24px', textAlign: 'left' }}>
                       <Badge variant={priorityVariant[t.priority]}>{t.priority}</Badge>
                     </td>
-                    <td style={{ padding: '14px 24px' }}>
+                    <td style={{ padding: '14px 24px', textAlign: 'left' }}>
                       <select
                         value={t.status}
                         onChange={(e) => updateStatus(t.id, e.target.value as TaskStatus)}
@@ -227,16 +227,35 @@ export default function TasksPage() {
                         <option value="completed">Completed</option>
                       </select>
                     </td>
-                    <td className="hidden md:table-cell" style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{t.assigned_to ? (employees.find(e => e.id === t.assigned_to)?.name || t.assigned_to) : '-'}</td>
-                    <td className="hidden lg:table-cell" style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{t.due_date ? new Date(t.due_date).toLocaleDateString() : '-'}</td>
-                    <td style={{ padding: '14px 24px' }}>
+                    <td className="hidden md:table-cell" style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'left' }}>{t.assigned_to ? (employees.find(e => e.id === t.assigned_to)?.name || t.assigned_to) : '-'}</td>
+                    <td className="hidden lg:table-cell" style={{ padding: '14px 24px', fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'left' }}>{t.due_date ? new Date(t.due_date).toLocaleDateString() : '-'}</td>
+                    <td style={{ padding: '14px 24px', textAlign: 'right' }}>
                       <button
                         onClick={() => del(t.id)}
-                        style={{ fontSize: 12, color: '#fca5a5', background: 'none', border: 'none', cursor: 'pointer' }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = '#fda4af' }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = '#fca5a5' }}
+                        className="inline-flex items-center justify-center transition-all"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          color: '#fca5a5',
+                          background: 'rgba(244,63,94,0.15)',
+                          border: '1px solid rgba(244,63,94,0.3)',
+                          borderRadius: 999,
+                          cursor: 'pointer',
+                          boxShadow: '0 0 10px rgba(244,63,94,0.1)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(244,63,94,0.25)'
+                          e.currentTarget.style.boxShadow = '0 0 14px rgba(244,63,94,0.2)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(244,63,94,0.15)'
+                          e.currentTarget.style.boxShadow = '0 0 10px rgba(244,63,94,0.1)'
+                        }}
+                        title="Delete"
                       >
-                        Delete
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </td>
                   </tr>
