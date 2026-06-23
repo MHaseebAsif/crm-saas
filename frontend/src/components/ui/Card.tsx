@@ -2,10 +2,11 @@ import { cn } from '../../lib/utils'
 
 interface CardProps {
   className?: string
+  style?: React.CSSProperties
   children: React.ReactNode
 }
 
-export function Card({ className, children }: CardProps) {
+export function Card({ className, style, children }: CardProps) {
   return (
     <div
       className={cn('rounded-2xl transition-all duration-300', className)}
@@ -15,6 +16,7 @@ export function Card({ className, children }: CardProps) {
         WebkitBackdropFilter: 'var(--glass-blur)',
         border: '1px solid var(--glass-border)',
         boxShadow: 'var(--glass-shadow)',
+        ...style,
       }}
     >
       {children}

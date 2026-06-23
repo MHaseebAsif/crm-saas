@@ -87,15 +87,6 @@ const gradientTitle: React.CSSProperties = {
   lineHeight: 1.2,
 }
 
-const glassSelect: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.05)',
-  border: '1px solid rgba(255,255,255,0.1)',
-  color: 'rgba(255,255,255,0.8)',
-  borderRadius: 10,
-  padding: '4px 8px',
-  fontSize: 12,
-}
-
 export default function DashboardPage() {
   const { role, user } = useAuthStore()
   const [stats, setStats] = useState<Stat[]>([])
@@ -180,12 +171,6 @@ export default function DashboardPage() {
     },
   ]
 
-  const tableRowHover = (e: React.MouseEvent<HTMLTableRowElement>, enter: boolean) => {
-    const el = e.currentTarget
-    el.style.background = enter ? 'rgba(255,255,255,0.04)' : 'transparent'
-    el.style.transform = enter ? 'translateY(-1px)' : 'translateY(0)'
-  }
-
   return (
     <div className="min-h-full w-full px-4 md:px-6 lg:px-8 py-6 space-y-8">
       <div>
@@ -202,21 +187,18 @@ export default function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((s) => (
-            <Link key={s.label} to={s.link}>
-              <Card
-                className="cursor-pointer"
-                style={{
-                  transition: 'all 0.25s ease',
-                }}
-              >
-                <CardBody className="py-6">
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{s.label}</p>
-                  <p style={{ fontSize: 40, fontWeight: 700, color: s.color, textShadow: `0 0 20px ${s.glow}`, lineHeight: 1 }}>
-                    {s.value}
-                  </p>
-                </CardBody>
-              </Card>
-            </Link>
+            <div key={s.label} style={{ transition: 'all 0.25s ease' }}>
+              <Link to={s.link}>
+                <Card className="cursor-pointer">
+                  <CardBody className="py-6">
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>{s.label}</p>
+                    <p style={{ fontSize: 40, fontWeight: 700, color: s.color, textShadow: `0 0 20px ${s.glow}`, lineHeight: 1 }}>
+                      {s.value}
+                    </p>
+                  </CardBody>
+                </Card>
+              </Link>
+            </div>
           ))}
         </div>
       )}
