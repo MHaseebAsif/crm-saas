@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { notificationsApi } from '../api/notifications'
+import { useAuthStore } from '../store/authStore'
 import type { Notification } from '../types'
 import { Card, CardHeader, CardBody, CardTitle } from '../components/ui/Card'
 import Button from '../components/ui/Button'
@@ -8,12 +10,16 @@ import EmptyState from '../components/ui/EmptyState'
 import { fmtDateTime } from '../lib/utils'
 import { cn } from '../lib/utils'
 
+const WS_BASE = import.meta.env.VITE_NOTIFICATION_WS_URL || 'ws://localhost:8004'
+
 export default function NotificationsPage() {
   const [items, setItems] = useState<Notification[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [marking, setMarking] = useState(false)
+  const wsRef = useRef<WebSocket | null>(null)
+  const tenantId = useAuthStore((s) => s.tenantId)
 
   const load = async (p = page) => {
     setLoading(true)
@@ -28,6 +34,61 @@ export default function NotificationsPage() {
   }
 
   useEffect(() => { load() }, [page])
+
+  useEffect(() => {
+    if (!tenantId) return
+
+    const ws = new WebSocket(`${WS_BASE}/notifications/ws/${tenantId}`)
+    wsRef.current = ws
+
+    ws.onmessage = (evt) => {
+      try {
+        const raw = JSON.parse(evt.data) as {
+          id: string
+          type: string
+          title: string
+          message: string
+          is_read: boolean
+          created_at: string | null
+        }
+        const notif: Notification = {
+          id: raw.id,
+          user_id: tenantId,
+          title: raw.title || raw.type,
+          message: raw.message,
+          is_read: false,
+          created_at: raw.created_at ?? new Date().toISOString(),
+        }
+        setItems((prev) => [notif, ...prev])
+        setTotal((t) => t + 1)
+        toast.custom(
+          (t) => (
+            <div
+              className={cn(
+                'flex gap-3 items-start bg-slate-800 border border-indigo-500/40 rounded-xl px-4 py-3 shadow-xl max-w-sm',
+                t.visible ? 'animate-enter' : 'animate-leave'
+              )}
+            >
+              <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0 mt-1" />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-100 truncate">{notif.title}</p>
+                {notif.message && (
+                  <p className="text-xs text-slate-400 mt-0.5 line-clamp-2">{notif.message}</p>
+                )}
+              </div>
+            </div>
+          ),
+          { duration: 4000 }
+        )
+      } catch (_) {}
+    }
+
+    ws.onerror = () => {}
+
+    return () => {
+      ws.close()
+    }
+  }, [tenantId])
 
   const markRead = async (id: string) => {
     try {
