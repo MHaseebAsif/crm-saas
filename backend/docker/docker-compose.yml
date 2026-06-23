@@ -107,6 +107,10 @@ services:
     ports:
       - "8003:8000"
     env_file: .env
+    environment:
+      RMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      RMQ_USER: admin
+      RMQ_PASS: admin123
     volumes:
       - ./scripts/service-entrypoint.sh:/app/service-entrypoint.sh
     command: ["/bin/sh", "/app/service-entrypoint.sh"]
@@ -132,6 +136,7 @@ services:
     env_file: .env
     environment:
       PUB_KEY: ${PUB_KEY}
+      RMQ_URL: amqp://guest:guest@rabbitmq:5672/
     volumes:
       - ./scripts/service-entrypoint.sh:/app/service-entrypoint.sh
     command: ["/bin/sh", "/app/service-entrypoint.sh"]

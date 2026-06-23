@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { employeesApi, type EmployeePayload } from '../api/employees'
 import type { Employee } from '../types'
+import toast from 'react-hot-toast'
 
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
@@ -19,7 +20,6 @@ export default function EmployeesPage() {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<EmployeePayload>({ name: '', email: '', role: 'employee' })
-  const [err, setErr] = useState('')
 
   const load = async (p = page, q = search) => {
     setLoading(true)
@@ -39,26 +39,27 @@ export default function EmployeesPage() {
     setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const save = async () => {
-    if (!form.name || !form.email) { setErr('Name and email required'); return }
+    if (!form.name || !form.email) { toast.error('Name and email required'); return }
     setSaving(true)
-    setErr('')
     try {
       await employeesApi.create(form)
       setOpen(false)
       setForm({ name: '', email: '', role: 'employee' })
+      toast.success('Employee created')
       load()
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setErr(msg || 'Failed to create employee')
+      toast.error(msg || 'Failed to create employee')
     } finally {
       setSaving(false)
     }
   }
 
   const del = async (id: string) => {
-    if (!confirm('Remove this employee?')) return
+    if (!window.confirm('Remove this employee?')) return
     try {
       await employeesApi.delete(id)
+      toast.success('Employee deleted')
       load()
     } catch (_) {}
   }
@@ -139,7 +140,7 @@ export default function EmployeesPage() {
 
       <Modal
         open={open}
-        onClose={() => { setOpen(false); setErr('') }}
+        onClose={() => setOpen(false)}
         title="Add Employee"
         footer={
           <>
@@ -149,7 +150,6 @@ export default function EmployeesPage() {
         }
       >
         <div className="space-y-4">
-          {err && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-sm text-red-400">{err}</div>}
           <Input id="e-name" label="Name" value={form.name} onChange={set('name')} required />
           <Input id="e-email" label="Email" type="email" value={form.email} onChange={set('email')} required />
           <div className="flex flex-col gap-1.5">

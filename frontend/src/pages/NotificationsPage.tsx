@@ -95,18 +95,18 @@ export default function NotificationsPage() {
                     <p className="text-sm text-slate-400 mt-0.5">{n.message}</p>
                     <p className="text-xs text-slate-500 mt-1">{fmtDateTime(n.created_at)}</p>
                   </div>
-                  <div className="flex items-start gap-3 shrink-0">
+                  <div className="flex items-start gap-2 shrink-0">
                     {!n.is_read && (
                       <button
                         onClick={() => markRead(n.id)}
-                        className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors mt-0.5"
+                        className="text-xs px-2.5 py-1 rounded-full border border-indigo-500 text-indigo-400 hover:bg-indigo-500/10 transition-colors mt-0.5"
                       >
                         Mark read
                       </button>
                     )}
                     <button
                       onClick={() => del(n.id)}
-                      className="text-xs text-slate-500 hover:text-red-400 transition-colors mt-0.5"
+                      className="text-xs px-2.5 py-1 rounded-full border border-red-500/60 text-red-400 hover:bg-red-500/10 transition-colors mt-0.5"
                     >
                       Delete
                     </button>

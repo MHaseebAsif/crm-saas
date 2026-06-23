@@ -27,7 +27,7 @@ async def list_notifs(
             "type": n.type,
             "status": "read" if n.is_read else "sent",
             "recipient": n.recipient,
-            "content": n.message,
+            "content": n.content,
         }
         for n in rows
     ]

@@ -3,6 +3,7 @@ import { tasksApi, type TaskPayload } from '../api/tasks'
 import { getEmployees } from '../api/employees'
 import type { Task, TaskStatus, TaskPriority } from '../types'
 import { Card } from '../components/ui/Card'
+import toast from 'react-hot-toast'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Badge from '../components/ui/Badge'
@@ -28,7 +29,6 @@ export default function TasksPage() {
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState<TaskPayload>({ title: '', priority: 'medium' })
-  const [err, setErr] = useState('')
   const [employees, setEmployees] = useState<{id: string, name: string}[]>([])
 
   const load = async (p = page, s = filter) => {
@@ -55,9 +55,8 @@ export default function TasksPage() {
     setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const save = async () => {
-    if (!form.title) { setErr('Title required'); return }
+    if (!form.title) { toast.error('Title required'); return }
     setSaving(true)
-    setErr('')
     try {
       const payload: Partial<TaskPayload> = {}
       Object.entries(form).forEach(([k, v]) => {
@@ -68,10 +67,11 @@ export default function TasksPage() {
       await tasksApi.create(payload as TaskPayload)
       setOpen(false)
       setForm({ title: '', priority: 'medium' })
+      toast.success('Task created')
       load()
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setErr(msg || 'Failed to create task')
+      toast.error(msg || 'Failed to create task')
     } finally {
       setSaving(false)
     }
@@ -81,15 +81,21 @@ export default function TasksPage() {
     try {
       await tasksApi.update(id, { status })
       setItems((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)))
-    } catch (_) {}
+      toast.success('Status updated')
+    } catch (_) {
+      toast.error('Failed to update status')
+    }
   }
 
   const del = async (id: string) => {
-    if (!confirm('Delete this task?')) return
+    if (!window.confirm('Delete this task?')) return
     try {
       await tasksApi.delete(id)
+      toast.success('Task deleted')
       load()
-    } catch (_) {}
+    } catch (_) {
+      toast.error('Failed to delete task')
+    }
   }
 
   const statuses: { v: TaskStatus | ''; l: string }[] = [
@@ -191,7 +197,7 @@ export default function TasksPage() {
 
       <Modal
         open={open}
-        onClose={() => { setOpen(false); setErr('') }}
+        onClose={() => setOpen(false)}
         title="New Task"
         footer={
           <>
@@ -201,7 +207,6 @@ export default function TasksPage() {
         }
       >
         <div className="space-y-4">
-          {err && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-sm text-red-400">{err}</div>}
           <Input id="t-title" label="Title" value={form.title} onChange={set('title')} required />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-slate-300">Assigned To</label>

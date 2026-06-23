@@ -6,4 +6,4 @@ class Notification(models.Model):
     type = fields.CharField(max_length=50)
     is_read = fields.BooleanField(default=False)
     recipient = fields.CharField(max_length=255)
-    message = fields.TextField()
+    content = fields.TextField()

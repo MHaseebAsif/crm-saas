@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { customersApi, type CustomerPayload } from '../api/customers'
 import type { Customer } from '../types'
+import toast from 'react-hot-toast'
 import { Card } from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
@@ -21,7 +22,6 @@ export default function CustomersPage() {
   const [saving, setSaving] = useState(false)
   const [viewCustomer, setViewCustomer] = useState<Customer | null>(null)
   const [form, setForm] = useState<CustomerPayload>({ name: '', email: '', status: 'lead', company: '', phone: '' })
-  const [err, setErr] = useState('')
 
   const load = async (p = page, q = search) => {
     setLoading(true)
@@ -47,17 +47,17 @@ export default function CustomersPage() {
     setForm((f) => ({ ...f, [k]: e.target.value }))
 
   const save = async () => {
-    if (!form.name || !form.email) { setErr('Name and email required'); return }
+    if (!form.name || !form.email) { toast.error('Name and email required'); return }
     setSaving(true)
-    setErr('')
     try {
       await customersApi.create(form)
       setOpen(false)
       setForm({ name: '', email: '', status: 'lead', company: '', phone: '' })
+      toast.success('Customer created')
       load()
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setErr(msg || 'Failed to create customer')
+      toast.error(msg || 'Failed to create customer')
     } finally {
       setSaving(false)
     }
@@ -137,7 +137,7 @@ export default function CustomersPage() {
 
       <Modal
         open={open}
-        onClose={() => { setOpen(false); setErr('') }}
+        onClose={() => setOpen(false)}
         title="Add Customer"
         footer={
           <>
@@ -147,7 +147,6 @@ export default function CustomersPage() {
         }
       >
         <div className="space-y-4">
-          {err && <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-sm text-red-400">{err}</div>}
           <Input id="c-name" label="Name" value={form.name} onChange={set('name')} required />
           <Input id="c-email" label="Email" type="email" value={form.email} onChange={set('email')} required />
           <Input id="c-phone" label="Phone" value={form.phone || ''} onChange={set('phone')} />

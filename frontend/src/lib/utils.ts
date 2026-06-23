@@ -11,10 +11,11 @@ export function fmt(date: string): string {
 }
 
 export function fmtDateTime(date: string): string {
-  return new Date(date).toLocaleString('en-US', {
-    year: 'numeric',
+  if (!date) return 'Just now'
+  return new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   })

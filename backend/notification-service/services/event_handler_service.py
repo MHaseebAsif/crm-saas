@@ -9,13 +9,14 @@ async def proc_msg(b: bytes):
     email = d.get("email", "")
     uid = d.get("id", "")
     tid = d.get("tenant_id", uid)
+    content = d.get("message", "New notification")
     await Notification.create(
         id=uuid.uuid4(),
         tenant_id=tid,
-        type="Welcome",
+        type="task_assigned",
         is_read=False,
         recipient=email,
-        message="Your account has been created.",
+        content=content,
     )
     try:
         await send_mail(email, "Welcome", "Your account has been created.")
