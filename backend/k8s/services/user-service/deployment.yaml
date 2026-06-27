@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: localhost:5000/crm-user-service:latest
+          image: docker-user-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8000
           envFrom:
@@ -29,6 +30,11 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: DB_URL_USER
+            - name: RMQ_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: RMQ_URL
           resources:
             requests:
               cpu: 100m

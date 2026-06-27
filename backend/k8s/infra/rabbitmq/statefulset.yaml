@@ -25,6 +25,13 @@ spec:
               value: rmquser
             - name: RABBITMQ_DEFAULT_PASS
               value: change_me_rabbitmq_password
+            - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
+              value: "-rabbit vm_memory_high_watermark 0.4"
+          resources:
+            requests:
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
           volumeMounts:
             - name: rabbitmq-data
               mountPath: /var/lib/rabbitmq
