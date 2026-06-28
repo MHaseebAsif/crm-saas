@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+
 import { notificationsApi } from '../api/notifications'
 import type { Notification } from '../types'
 import { Card, CardHeader, CardBody, CardTitle } from '../components/ui/Card'
