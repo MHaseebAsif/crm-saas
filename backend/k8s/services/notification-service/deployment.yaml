@@ -16,7 +16,7 @@ spec:
       containers:
         - name: notification-service
           image: docker-notification-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:

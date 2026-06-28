@@ -16,7 +16,7 @@ spec:
       containers:
         - name: crm-service
           image: docker-crm-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:

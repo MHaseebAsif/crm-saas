@@ -16,7 +16,7 @@ spec:
       containers:
         - name: user-service
           image: docker-user-service:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           envFrom:
